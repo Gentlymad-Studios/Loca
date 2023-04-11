@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:VisualElement name="locaRoot" style="height: auto; width: auto; flex-grow: 1; flex-direction: column; flex-wrap: wrap;">
+        <ui:VisualElement name="header" style="flex-direction: row; height: 25px;">
+            <ui:VisualElement name="headerLeft" style="flex-grow: 1; flex-direction: row;">
+                <ui:Label tabindex="-1" text="Loca is up to date" display-tooltip-when-elided="true" name="statusLabel" style="-unity-text-align: middle-left; -unity-font-style: italic; margin-left: 5px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="headerRight" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; flex-direction: row-reverse;">
+                <ui:Button text="Save" display-tooltip-when-elided="true" tooltip="Save Loca to Google Sheet" name="saveButton" style="max-width: none; width: 125px;" />
+                <ui:Button text="Pull / Update" display-tooltip-when-elided="true" tooltip="Pull Loca from Google Sheet" name="pullButton" style="max-width: none; width: 125px;" />
+                <ui:DropdownField index="-1" name="databaseSelection" style="min-width: 200px; margin-right: 20px;" />
+                <ui:Label tabindex="-1" text="Database" display-tooltip-when-elided="true" style="-unity-text-align: middle-right;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="tableRoot" style="height: auto; width: auto; flex-grow: 1; flex-direction: column; flex-wrap: wrap;">
+            <ui:MultiColumnListView style="padding: 5px;">
+                <ui:Columns />
+            </ui:MultiColumnListView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,23 @@
+{
+	"name": "com.gentlymadstudios.loca",
+	"displayName": "Loca Manager",
+	"description": "Organizes Loca in Unity based on an Google Spreadsheet.",
+	"version": "0.0.1",
+	"unity": "2022.2",
+	"license": "MIT",
+	"documentationUrl": "https://github.com/Gentlymad-Studios/Loca/blob/master/README.md",
+  	"changelogUrl": "https://github.com/Gentlymad-Studios/Loca/blob/master/CHANGELOG.md",
+  	"licensesUrl": "https://github.com/Gentlymad-Studios/Loca/blob/master/LICENSE.md",
+	"custom_packageJsonLink": "https://raw.githubusercontent.com/Gentlymad-Studios/Loca/master/package.json",
+  "custom_gitDependencies": {
+		"com.gentlymadstudios.editorhelper": "https://github.com/Gentlymad-Studios/EditorHelper.git"
+	},
+	"author": {
+		"name": "Gentlymad Studios",
+		"url": "https://gentlymadstudios.com",
+		"email": "team@gentlymadstudios.com"
+	},
+	"dependencies": {
+		"com.unity.nuget.newtonsoft-json": "3.0.2"
+	}
+}

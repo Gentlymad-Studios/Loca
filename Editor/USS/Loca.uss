@@ -1,0 +1,18 @@
+VisualElement.cell TextField {
+    display: none;
+    flex-grow: 1; 
+    white-space: normal;
+}
+
+VisualElement.cell {
+    flex-grow: 1;
+    border-right-width: 1px;
+    border-right-color: rgba(0,0,0,0.4);
+}
+
+VisualElement.cell Label{
+    overflow: hidden;
+    white-space: normal;
+    padding: 5px;
+    text-overflow: ellipsis;
+}
