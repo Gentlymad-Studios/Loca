@@ -3,10 +3,13 @@ using UnityEngine;
 
 namespace Loca {
     public class LocaDebugWindow : EditorWindow {
-        [MenuItem(LocaSettings.menuItemBase + nameof(LocaDebugWindow))]
+        const string WINDOWNAME = "Loca Debug";
+
+        [MenuItem(LocaSettings.menuItemBase + WINDOWNAME, priority = 41)]
         static void Init() {
             // Get existing open window or if none, make a new one:
-            LocaDebugWindow window = (LocaDebugWindow)GetWindow(typeof(LocaDebugWindow));
+            LocaDebugWindow window = GetWindow<LocaDebugWindow>(WINDOWNAME);
+            window.name = "Loca Debug";
             window.Show();
         }
 

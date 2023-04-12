@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 namespace Loca {
     [FilePath("ProjectSettings/" + nameof(LocaSettings) + ".asset", FilePathAttribute.Location.ProjectFolder)]
     public class LocaSettings : ScriptableSingleton<LocaSettings> {
-        public const string menuItemBase = "Tools/";
+        public const string menuItemBase = "Tools/Loca/";
 
         [Space]
         public HeaderDataSettings headerSettings = new HeaderDataSettings();

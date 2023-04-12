@@ -13,7 +13,7 @@ namespace Loca {
             return LocaSettings.instance ? new LocaSettingsProvider() : null;
         }
 
-        public LocaSettingsProvider(SettingsScope scope = SettingsScope.Project) : base("Tools/GenltyLoca", scope) {
+        public LocaSettingsProvider(SettingsScope scope = SettingsScope.Project) : base("Tools/GentlyLoca", scope) {
             keywords = tags;
         }
 

@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Loca {
     public class LocaWindow : EditorWindow {
+        const string WINDOWNAME = "Loca Manager";
         private static LocaWindow window;
         private SerializedObject serializedObject;
         private Label statusLabel;
@@ -19,9 +18,9 @@ namespace Loca {
         private string selectedDatabaseName;
         private int selectedDatabaseIndex = 0;
 
-        [MenuItem(LocaSettings.menuItemBase + nameof(LocaWindow))]
+        [MenuItem(LocaSettings.menuItemBase + WINDOWNAME, priority = 40)]
         public static void Initialize() {
-            window = GetWindow<LocaWindow>(nameof(LocaWindow));
+            window = GetWindow<LocaWindow>(WINDOWNAME);
             window.Show();
         }
 

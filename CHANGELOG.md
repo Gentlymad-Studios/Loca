@@ -9,3 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.1] - 2023-04-11
 ### Added
 - Initial release
+
+## [0.0.2] - 2023-04-12
+### Changed
+- Change Window Names
+- Change MenuItem Priority
