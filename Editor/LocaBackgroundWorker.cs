@@ -73,7 +73,7 @@ namespace Loca {
 
                 if (failToGetModifiedDate) {
                     locaStatus = "Unable to reach LocaSheet modified Date";
-                    Debug.LogError("Unable to reach LocaSheet modified Date");
+                    Debug.LogWarning("Unable to reach LocaSheet modified Date");
                 }
 
                 LocaBase.currentlyUpdating = false;
@@ -113,7 +113,7 @@ namespace Loca {
                 LocaDatabase.instance.hasOnlineChanges = LocaBase.LocalDatabaseIsUpToDate(out bool failToGetModifiedDate);
 
                 if (failToGetModifiedDate) {
-                    Debug.LogError("Unable to reach LocaSheet modified Date");
+                    Debug.LogWarning("Unable to reach LocaSheet modified Date");
                     return;
                 }
 

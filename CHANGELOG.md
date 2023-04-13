@@ -14,3 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Change Window Names
 - Change MenuItem Priority
+
+## [0.0.3] - 2023-04-13
+### Changed
+- Background Logs are now WarningLogs instead of ErrorLogs
