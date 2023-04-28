@@ -108,60 +108,32 @@ namespace Loca {
                 } else {
                     //entry keeps the local version, so we add new languages if necessary
                     if (languageColumnUpdated) {
-                        List<LocaEntry.LocaArray> entriesContentBackup = locaEntries[curLocaEntryIndex].content;
-
-                        List<LocaEntry.LocaArray> entriesContent = new List<LocaEntry.LocaArray>();
-                        for (int i = 0; i < languages.Count; i++) {
-                            bool isNew = true;
-
-                            for (int j = 0; j < entriesContentBackup.Count; j++) {
-                                if (entriesContentBackup[j].languageKey == languages[i]) {
-                                    isNew = false;
-                                    entriesContent.Add(entriesContentBackup[j]);
-                                    break;
-                                }
-                            }
-
-                            //Add a placeholder if its a new language
-                            if (isNew) {
-                                entriesContent.Add(new LocaEntry.LocaArray {
-                                    content = "",
-                                    languageKey = languages[i]
-                                });
-                            }
-                        }
-
-                        locaEntries[curLocaEntryIndex].content = entriesContent;
+                        locaEntries[curLocaEntryIndex].ReorganizeLocaArray(languages);
                     }
 
                     //do the same for misc columns
                     if (miscColumnUpdated) {
-                        List<LocaEntry.MiscArray> entriesContentBackup = locaEntries[curLocaEntryIndex].miscContent;
-
-                        List<LocaEntry.MiscArray> entriesContent = new List<LocaEntry.MiscArray> ();
-                        for (int i = 0; i < miscs.Count; i++) {
-                            bool isNew = true;
-
-                            for (int j = 0; j < entriesContentBackup.Count; j++) {
-                                if (entriesContentBackup[j].title.ToLower() == miscs[i].ToLower()) {
-                                    isNew = false;
-                                    entriesContent.Add(entriesContentBackup[j]);
-                                    break;
-                                }
-                            }
-
-                            //Add a placeholder if its a new column
-                            if (isNew) {
-                                entriesContent.Add(new LocaEntry.MiscArray {
-                                    content = "",
-                                    title = miscs[i]
-                                });
-                            }
-                        }
-
-                        locaEntries[curLocaEntryIndex].miscContent = entriesContent;
+                        locaEntries[curLocaEntryIndex].ReorganizeMiscArray(miscs);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Adds a new LocaEntry if not already exists, columns will be reorganized
+        /// </summary>
+        /// <param name="locaEntry"></param>
+        public void AddLocaEntry(LocaEntry locaEntry) {
+            //Try to get the corresponding LocaEntry Index in our current database
+            int curLocaEntryIndex = GetLocaEntryIndex(locaEntry.key);
+
+            if (curLocaEntryIndex == -1) {
+                locaEntry.ReorganizeLocaArray(languages);
+                locaEntry.ReorganizeMiscArray(miscs);
+                locaEntry.EntryUpdated();
+
+                locaEntries.Add(locaEntry);
+                locaEntriesMapping.Add(locaEntry.key.ToLower(), locaEntries.Count - 1);
             }
         }
 

@@ -36,5 +36,59 @@ namespace Loca {
             LocaDatabase.instance.lastModifiedLocal = timestamp;
             LocaDatabase.instance.hasLocalChanges = true;
         }
+
+        public void ReorganizeLocaArray(List<string> languages) {
+            List<LocaArray> oldContent = content;
+
+            List<LocaArray> newContent = new List<LocaArray>();
+            for (int i = 0; i < languages.Count; i++) {
+                bool isNew = true;
+
+                for (int j = 0; j < oldContent.Count; j++) {
+                    if (oldContent[j].languageKey == languages[i]) {
+                        isNew = false;
+                        newContent.Add(oldContent[j]);
+                        break;
+                    }
+                }
+
+                //Add a placeholder if its a new language
+                if (isNew) {
+                    newContent.Add(new LocaArray {
+                        content = "",
+                        languageKey = languages[i]
+                    });
+                }
+            }
+
+            content = newContent;
+        }
+
+        public void ReorganizeMiscArray(List<string> miscs) {
+            List<MiscArray> oldContent = miscContent;
+
+            List<MiscArray> newContent = new List<MiscArray>();
+            for (int i = 0; i < miscs.Count; i++) {
+                bool isNew = true;
+
+                for (int j = 0; j < oldContent.Count; j++) {
+                    if (oldContent[j].title.ToLower() == miscs[i].ToLower()) {
+                        isNew = false;
+                        newContent.Add(oldContent[j]);
+                        break;
+                    }
+                }
+
+                //Add a placeholder if its a new column
+                if (isNew) {
+                    newContent.Add(new MiscArray {
+                        content = "",
+                        title = miscs[i]
+                    });
+                }
+            }
+
+            miscContent = newContent;
+        }
     }
 }
