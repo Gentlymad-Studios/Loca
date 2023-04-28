@@ -5,7 +5,7 @@ namespace Loca {
     public class LocaDebugWindow : EditorWindow {
         const string WINDOWNAME = "Loca Debug";
 
-        [MenuItem(LocaSettings.menuItemBase + WINDOWNAME, priority = 41)]
+        [MenuItem(LocaSettings.MENUITEMBASE + nameof(Loca) + "/" + WINDOWNAME, priority = 41)]
         static void Init() {
             // Get existing open window or if none, make a new one:
             LocaDebugWindow window = GetWindow<LocaDebugWindow>(WINDOWNAME);

@@ -16,3 +16,8 @@ VisualElement.cell Label{
     padding: 5px;
     text-overflow: ellipsis;
 }
+
+Button.iconBtn {
+    width: 22px;
+	padding:1px;
+}

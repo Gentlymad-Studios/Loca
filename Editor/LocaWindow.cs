@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEditor;
 using UnityEngine.UIElements;
 
@@ -18,7 +19,7 @@ namespace Loca {
         private string selectedDatabaseName;
         private int selectedDatabaseIndex = 0;
 
-        [MenuItem(LocaSettings.menuItemBase + WINDOWNAME, priority = 40)]
+        [MenuItem(LocaSettings.MENUITEMBASE + nameof(Loca) + "/" + WINDOWNAME, priority = 40)]
         public static void Initialize() {
             window = GetWindow<LocaWindow>(WINDOWNAME);
             window.Show();
@@ -77,13 +78,27 @@ namespace Loca {
             EditorApplication.update += OnUpdate;
 
             //Link Buttons
-            Button saveButton = rootVisualElement.Q("saveButton") as Button;
-            saveButton.clicked -= SaveButton_clicked;
-            saveButton.clicked += SaveButton_clicked;
+            Button exportButton = rootVisualElement.Q("exportButton") as Button;
+            exportButton.clicked -= ExportButton_clicked;
+            exportButton.clicked += ExportButton_clicked;
+
+            Button uploadButton = rootVisualElement.Q("uploadButton") as Button;
+            uploadButton.clicked -= UploadButton_clicked;
+            uploadButton.clicked += UploadButton_clicked;
 
             Button pullButton = rootVisualElement.Q("pullButton") as Button;
             pullButton.clicked -= PullButton_clicked;
             pullButton.clicked += PullButton_clicked;
+
+            Button settingsButton = rootVisualElement.Q("settingsButton") as Button;
+            settingsButton.clicked -= SettingsButton_clicked;
+            settingsButton.clicked += SettingsButton_clicked;
+            settingsButton.Add(new Image() { image = EditorGUIUtility.IconContent("Settings@2x").image });
+
+            Button refreshButton = rootVisualElement.Q("refreshButton") as Button;
+            refreshButton.clicked -= RefreshButton_clicked;
+            refreshButton.clicked += RefreshButton_clicked;
+            refreshButton.Add(new Image() { image = EditorGUIUtility.IconContent("Refresh@2x").image });
 
             //Link Dropdown
             databaseSelection = rootVisualElement.Q("databaseSelection") as DropdownField;
@@ -99,15 +114,25 @@ namespace Loca {
             int fixedItemHeight = LocaSettings.instance.fixedRowHeight;
             int initialColumnWidth = LocaSettings.instance.initialColumnWidth;
 
+            Label noDataLabel = rootVisualElement.Q<Label>("noDataLabel");
+            noDataLabel.style.display = DisplayStyle.None;
+
             table = rootVisualElement.Q<MultiColumnListView>();
 
             //Reset
             table.itemsSource = null;
             table.columns.Clear();
 
+            if (curDatabase == null) {
+                noDataLabel.style.display = DisplayStyle.Flex;
+                table.visible = false;
+                return;
+            }
+
             //Setup
             table.style.paddingRight = 17; //because of the vertical scrollbar
             //table.showAddRemoveFooter = true;
+            table.visible = true;
             table.showBorder = true;
             table.horizontalScrollingEnabled = true; //fixes the scale issues
             table.itemsSource = curDatabase.locaEntries;
@@ -293,16 +318,30 @@ namespace Loca {
         #endregion
 
         #region Button Events
-        private void SaveButton_clicked() {
+        private void ExportButton_clicked() {
+            LocaJsonHandler.WriteLocasheets();
+        }
+
+        private void UploadButton_clicked() {
             LocaBase.SaveDatabasesToSheets();
             SetupDatabaseSelection();
-            table.RefreshItems();
+
+            CreateMultiColumnListView();
         }
 
         private void PullButton_clicked() {
             LocaBase.ExtractDatabasesFromSheets();
             SetupDatabaseSelection();
-            table.RefreshItems();
+
+            CreateMultiColumnListView();
+        }
+
+        private void SettingsButton_clicked() {
+            SettingsService.OpenProjectSettings($"{LocaSettings.MENUITEMBASE}{nameof(Loca)}");
+        }
+
+        private void RefreshButton_clicked() {
+            CreateMultiColumnListView();
         }
         #endregion
 
@@ -315,6 +354,10 @@ namespace Loca {
 
             for (int i = 0; i < LocaDatabase.instance.databases.Count; i++) {
                 databaseChoices.Add(LocaDatabase.instance.databases[i].sheetName);
+            }
+
+            if (databaseChoices.Count == 0) {
+                return;
             }
 
             databaseSelection.choices = databaseChoices;
