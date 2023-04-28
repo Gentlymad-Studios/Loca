@@ -73,13 +73,9 @@ namespace Loca {
 
             //check for language updated
             bool languageColumnUpdated = !languages.SequenceEqual(newSubDatabase.languages);
-            languages = newSubDatabase.languages;
-            languageColumnIndex = newSubDatabase.languageColumnIndex;
 
             //check the miscColumns aswell
             bool miscColumnUpdated = !miscs.SequenceEqual(newSubDatabase.miscs);
-            miscs = newSubDatabase.miscs;
-            miscColumnIndex = newSubDatabase.miscColumnIndex;
 
             //Iterate through each LocaEntry
             for (int i = 0; i < newSubDatabase.locaEntries.Count; i++) {

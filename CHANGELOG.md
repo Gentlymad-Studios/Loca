@@ -22,3 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.4] - 2023-04-28
 ### Added
 - Add Method to add a new LocaEntry
+
+## [0.0.5] - 2023-04-28
+### Changed
+- database merge between online and local, now prioritize the online structure

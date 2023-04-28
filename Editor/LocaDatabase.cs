@@ -31,13 +31,13 @@ namespace Loca {
         }
 
         /// <summary>
-        /// Update this Database fromn the given new one
+        /// Update this Database from the given new one
         /// </summary>
         /// <param name="newDatabases">List of the new Subdatabases</param>
         public void UpdateDatabase(List<LocaSubDatabase> newDatabases) {
             if (databases == null) {
                 databases = newDatabases;
-                hasOnlineChanges = true;
+                hasOnlineChanges = false;
                 return;
             }
 
@@ -50,7 +50,9 @@ namespace Loca {
                 for (int j = 0; j < databases.Count; j++) {
                     if (newDatabases[i].sheetName == databases[j].sheetName) {
                         //Update the database
-                        databases[j].Update(newDatabases[i]);
+                        newDatabases[i].Update(databases[j]);
+                        databases[j] = newDatabases[i];
+
                         isNew = false;
                         break;
                     }
@@ -63,7 +65,7 @@ namespace Loca {
                 }
             }
 
-            hasOnlineChanges = true;
+            hasOnlineChanges = false;
         }
 
         /// <summary>
