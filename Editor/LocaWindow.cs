@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEditor;
 using UnityEngine.UIElements;
 
@@ -23,7 +22,6 @@ namespace Loca {
         public static void Initialize() {
             window = GetWindow<LocaWindow>(WINDOWNAME);
             window.minSize = new UnityEngine.Vector2(1280, 400);
-            //window.maxSize = new UnityEngine.Vector2(100, 100);
 
             window.Show();
         }
