@@ -2,7 +2,7 @@
 	"name": "com.gentlymadstudios.loca",
 	"displayName": "Loca Manager",
 	"description": "Organizes Loca in Unity based on an Google Spreadsheet.",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"unity": "2022.2",
 	"license": "MIT",
 	"documentationUrl": "https://github.com/Gentlymad-Studios/Loca/blob/master/README.md",

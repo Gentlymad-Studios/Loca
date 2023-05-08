@@ -30,3 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.6] - 2023-04-28
 ### Add
 - add refresh, settings and export button to loca manager
+
+## [0.0.7] - 2023-05-08
+### Changed
+- set a fixed minimum window size

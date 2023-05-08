@@ -22,6 +22,9 @@ namespace Loca {
         [MenuItem(LocaSettings.MENUITEMBASE + nameof(Loca) + "/" + WINDOWNAME, priority = 40)]
         public static void Initialize() {
             window = GetWindow<LocaWindow>(WINDOWNAME);
+            window.minSize = new UnityEngine.Vector2(1280, 400);
+            //window.maxSize = new UnityEngine.Vector2(100, 100);
+
             window.Show();
         }
 
