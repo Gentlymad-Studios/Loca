@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,10 +10,11 @@ namespace Loca {
         private static LocaWindow window;
         private SerializedObject serializedObject;
         private Label statusLabel;
-        private MultiColumnListView table;
         private LocaSubDatabase curDatabase;
-        private ScrollView scrollView;
         private DropdownField databaseSelection;
+        private LocaSearchWindow searchWindow;
+        public ScrollView scrollView;
+        public MultiColumnListView table;
 
         //Cache
         private VisualElement activeElement;
@@ -109,6 +111,10 @@ namespace Loca {
             Button removeButton = rootVisualElement.Q("removeEntryButton") as Button;
             removeButton.clicked -= RemoveEntryButton_clicked;
             removeButton.clicked += RemoveEntryButton_clicked;
+
+            Button searchButton = rootVisualElement.Q("searchButton") as Button;
+            searchButton.clicked -= SearchButton_clicked;
+            searchButton.clicked += SearchButton_clicked;
 
             //Link Dropdown
             databaseSelection = rootVisualElement.Q("databaseSelection") as DropdownField;
@@ -369,6 +375,15 @@ namespace Loca {
             curDatabase.RemoveLocaEntry(selectedEntry);
             CreateMultiColumnListView();
         }
+
+        private void SearchButton_clicked() {
+            if (searchWindow == null) {
+                searchWindow = CreateInstance<LocaSearchWindow>();
+                searchWindow.Initialize(curDatabase, this);
+                searchWindow.Show();
+            }
+            searchWindow.Focus();
+        }
         #endregion
 
         #region Database Selection Logic
@@ -414,6 +429,11 @@ namespace Loca {
             selectedDatabaseIndex = databaseSelection.index;
 
             curDatabase = LocaDatabase.instance.databases[databaseSelection.index];
+
+            if (searchWindow != null) {
+                searchWindow.Close();
+                searchWindow = null;
+            }
 
             //Redraw ListView
             CreateMultiColumnListView();

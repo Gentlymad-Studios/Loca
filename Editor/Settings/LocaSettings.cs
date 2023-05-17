@@ -19,7 +19,7 @@ namespace Loca {
         [Space]
         public JsonDataSettings jsonSettings = new JsonDataSettings();
 
-        [Header("View Settings")]
+        [Header("Base View Settings")]
         [Tooltip("GUID of the UXML File")]
         [SerializeField]
         private string uxmlIdentifier = "1abcc2e99cae6a4498df98599603eef6";
@@ -36,6 +36,12 @@ namespace Loca {
         public int initialColumnWidth = 300;
         [Tooltip("Fontcolor for changed Entries.")]
         public Color hightlightColor = Color.red;
+
+        [Header("Search View Settings")]
+        [Tooltip("GUID of the UXML File")]
+        [SerializeField]
+        private string searchUxmlIdentifier = "57a565a7e0944f84aa96db85d9a8d7dc";
+        public static VisualTreeAsset searchUxml => AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath(instance.searchUxmlIdentifier));
 
         public void OnEnable() {
             hideFlags &= ~HideFlags.NotEditable;

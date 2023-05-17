@@ -240,6 +240,25 @@ namespace Loca {
                 }
             }
         }
+
+        /// <summary>
+        /// Returns a list of entries which keys contains the given term
+        /// </summary>
+        /// <param name="term"></param>
+        /// <returns></returns>
+        public List<LocaSearchEntry> GetFilteredListOfEntries(string term) {
+            List<LocaSearchEntry> filteredEntries = new List<LocaSearchEntry>();
+
+            term = term.ToLowerInvariant();
+
+            foreach (KeyValuePair<string, int> mapping in _locaEntriesMapping) {
+                if (mapping.Key.ToLowerInvariant().Contains(term)) {
+                    filteredEntries.Add(new LocaSearchEntry(locaEntries[mapping.Value], mapping.Value));
+                }
+            }
+
+            return filteredEntries;
+        }
         #endregion
 
         #region JSON Methods

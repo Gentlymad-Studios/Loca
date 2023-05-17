@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:VisualElement name="root" style="height: auto; width: auto; flex-grow: 1; flex-direction: column; flex-wrap: nowrap;">
+        <ui:VisualElement name="VisualElement" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); flex-direction: row; height: auto; max-height: 25px; min-height: 25px; margin-top: 2px;">
+            <ui:TextField picking-mode="Ignore" name="searchTxtFld" style="flex-grow: 1;" />
+            <ui:Button display-tooltip-when-elided="true" name="prevButton" class="iconBtn" />
+            <ui:Button display-tooltip-when-elided="true" name="nextButton" class="iconBtn" />
+        </ui:VisualElement>
+        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="outputLabel" style="margin-left: 4px;" />
+    </ui:VisualElement>
+</ui:UXML>
