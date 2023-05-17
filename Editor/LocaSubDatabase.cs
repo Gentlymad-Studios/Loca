@@ -23,7 +23,7 @@ namespace Loca {
             get {
                 if (locaEntriesMapping.Count == 0) {
                     for (int i = 0; i < locaEntries.Count; i++) {
-                        locaEntriesMapping.Add(locaEntries[i].key.ToLower(), i);
+                        locaEntriesMapping.Add(locaEntries[i].key.ToLowerInvariant(), i);
                     }
                 }
 
@@ -96,7 +96,7 @@ namespace Loca {
                 //only add new entry if the timestamp is newer then our last online poll
                 if (updateLocaEntry.timestamp > LocaDatabase.instance.lastModifiedOnline) {
                     locaEntries.Add(updateLocaEntry);
-                    locaEntriesMapping.Add(updateLocaEntry.key.ToLower(), locaEntries.Count - 1);
+                    locaEntriesMapping.Add(updateLocaEntry.key.ToLowerInvariant(), locaEntries.Count - 1);
                 }
             } else {
                 if (locaEntries[curLocaEntryIndex].timestamp < updateLocaEntry.timestamp) {
@@ -129,8 +129,40 @@ namespace Loca {
                 locaEntry.EntryUpdated();
 
                 locaEntries.Add(locaEntry);
-                locaEntriesMapping.Add(locaEntry.key.ToLower(), locaEntries.Count - 1);
+                locaEntriesMapping.Add(locaEntry.key.ToLowerInvariant(), locaEntries.Count - 1);
             }
+        }
+
+        /// <summary>
+        /// Creates a new LocaEntry from the given key name
+        /// </summary>
+        /// <param name="key"></param>
+        public bool CreateLocaEntry(string key) {
+            if (!KeyExists(key)) {
+                //create new one
+                LocaEntry locaEntry = new LocaEntry();
+                locaEntry.key = key.ToLowerInvariant();
+
+                locaEntry.ReorganizeLocaArray(languages);
+                locaEntry.ReorganizeMiscArray(miscs);
+                locaEntry.EntryUpdated();
+
+                locaEntries.Add(locaEntry);
+                locaEntriesMapping.Add(locaEntry.key.ToLowerInvariant(), locaEntries.Count - 1);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Removes the given LocaEntry
+        /// </summary>
+        /// <param name="locaEntry"></param>
+        public void RemoveLocaEntry(LocaEntry locaEntry) {
+            locaEntries.Remove(locaEntry);
+            ClearEntriesMapping();
         }
 
         /// <summary>
@@ -163,7 +195,7 @@ namespace Loca {
         /// <param name="key">locakey</param>
         /// <returns>return the index of the locaentry, returns -1 if the key was not found</returns>
         private int GetLocaEntryIndex(string key) {
-            return _locaEntriesMapping.TryGetValue(key.ToLower(), out int index) ? index : -1;
+            return _locaEntriesMapping.TryGetValue(key.ToLowerInvariant(), out int index) ? index : -1;
         }
 
         /// <summary>
@@ -193,7 +225,7 @@ namespace Loca {
         /// <param name="key">key you want to check</param>
         /// <returns>true if the key already exists</returns>
         public bool KeyExists(string key) {
-            return _locaEntriesMapping.ContainsKey(key.ToLower());
+            return _locaEntriesMapping.ContainsKey(key.ToLowerInvariant());
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Loca {
@@ -100,6 +101,14 @@ namespace Loca {
             refreshButton.clicked -= RefreshButton_clicked;
             refreshButton.clicked += RefreshButton_clicked;
             refreshButton.Add(new Image() { image = EditorGUIUtility.IconContent("Refresh@2x").image });
+
+            Button addButton = rootVisualElement.Q("addEntryButton") as Button;
+            addButton.clicked -= AddEntryButton_clicked;
+            addButton.clicked += AddEntryButton_clicked;
+
+            Button removeButton = rootVisualElement.Q("removeEntryButton") as Button;
+            removeButton.clicked -= RemoveEntryButton_clicked;
+            removeButton.clicked += RemoveEntryButton_clicked;
 
             //Link Dropdown
             databaseSelection = rootVisualElement.Q("databaseSelection") as DropdownField;
@@ -342,6 +351,22 @@ namespace Loca {
         }
 
         private void RefreshButton_clicked() {
+            CreateMultiColumnListView();
+        }
+
+        private void AddEntryButton_clicked() {
+            string key = LocaNewEntryPopup.Initialize(curDatabase);
+            bool wasCreated = curDatabase.CreateLocaEntry(key);
+
+            if (wasCreated) {
+                CreateMultiColumnListView();
+                scrollView.verticalScroller.value = scrollView.verticalScroller.highValue;
+            }
+        }
+
+        private void RemoveEntryButton_clicked() {
+            LocaEntry selectedEntry = table.selectedItem as LocaEntry;
+            curDatabase.RemoveLocaEntry(selectedEntry);
             CreateMultiColumnListView();
         }
         #endregion

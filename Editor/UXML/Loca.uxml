@@ -1,8 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <ui:VisualElement name="locaRoot" style="height: auto; width: auto; flex-grow: 1; flex-direction: column; flex-wrap: wrap;">
-        <ui:VisualElement name="header" style="flex-direction: row; height: 25px;">
+    <ui:VisualElement name="locaRoot" style="height: auto; width: auto; flex-grow: 1; flex-direction: column; flex-wrap: nowrap;">
+        <ui:VisualElement name="header" style="flex-direction: row; height: 25px; flex-shrink: 0; margin-left: 2px; margin-right: 2px; margin-top: 2px;">
             <ui:VisualElement name="headerLeft" style="flex-grow: 1; flex-direction: row;">
-                <ui:Label tabindex="-1" text="Loca is up to date" display-tooltip-when-elided="true" name="statusLabel" style="-unity-text-align: middle-left; -unity-font-style: italic; margin-left: 5px;" />
+                <ui:Label tabindex="-1" text="Database" display-tooltip-when-elided="true" style="-unity-text-align: middle-right; margin-left: 4px;" />
+                <ui:DropdownField index="-1" name="databaseSelection" style="min-width: 200px; margin-right: 20px; width: 200px;" />
             </ui:VisualElement>
             <ui:VisualElement name="headerRight" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; flex-direction: row-reverse;">
                 <ui:Button display-tooltip-when-elided="true" name="settingsButton" class="iconBtn" />
@@ -10,15 +11,22 @@
                 <ui:Button text="Export to JSON" display-tooltip-when-elided="true" tooltip="Export Loca to JSON" name="exportButton" style="max-width: none; width: 125px;" />
                 <ui:Button text="Upload to Sheet" display-tooltip-when-elided="true" tooltip="Save Loca to Google Sheet" name="uploadButton" style="max-width: none; width: 125px;" />
                 <ui:Button text="Pull / Update" display-tooltip-when-elided="true" tooltip="Pull Loca from Google Sheet" name="pullButton" style="max-width: none; width: 125px;" />
-                <ui:DropdownField index="-1" name="databaseSelection" style="min-width: 200px; margin-right: 20px;" />
-                <ui:Label tabindex="-1" text="Database" display-tooltip-when-elided="true" style="-unity-text-align: middle-right;" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="tableRoot" style="height: auto; width: auto; flex-grow: 1; flex-direction: column; flex-wrap: wrap;">
+        <ui:VisualElement name="tableRoot" style="flex-direction: column; flex-wrap: wrap; flex-grow: 1;">
             <ui:Label tabindex="-1" text="No Data" display-tooltip-when-elided="true" name="noDataLabel" style="-unity-text-align: upper-center; font-size: 20px; -unity-font-style: normal;" />
             <ui:MultiColumnListView style="padding: 5px;">
                 <ui:Columns />
             </ui:MultiColumnListView>
+        </ui:VisualElement>
+        <ui:VisualElement name="footer" style="background-color: rgba(0, 0, 0, 0); max-height: 25px; flex-direction: row; flex-shrink: 0; margin-bottom: 4px;">
+            <ui:VisualElement name="footerLeft" style="flex-grow: 1; flex-direction: row;">
+                <ui:Label tabindex="-1" text="Loca is up to date" display-tooltip-when-elided="true" name="statusLabel" style="-unity-text-align: middle-left; -unity-font-style: italic; margin-left: 5px;" />
+            </ui:VisualElement>
+            <ui:VisualElement name="footerRight" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; flex-direction: row-reverse;">
+                <ui:Button text="Remove Entry" display-tooltip-when-elided="true" tooltip="Remove the Selected Entry" name="removeEntryButton" style="max-width: none; width: 125px; margin-top: 0; height: 22px; margin-bottom: 0;" />
+                <ui:Button text="Add Entry" display-tooltip-when-elided="true" tooltip="Add a new Entry" name="addEntryButton" style="max-width: none; width: 125px; margin-top: 0; height: 22px; margin-bottom: 0;" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

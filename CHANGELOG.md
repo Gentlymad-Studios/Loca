@@ -34,3 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.7] - 2023-05-08
 ### Changed
 - set a fixed minimum window size
+
+## [0.0.8] - 2023-05-17
+### Added
+- Functionality to add and remove LocaEntries
