@@ -5,6 +5,6 @@
             <ui:Button display-tooltip-when-elided="true" name="prevButton" class="iconBtn" />
             <ui:Button display-tooltip-when-elided="true" name="nextButton" class="iconBtn" />
         </ui:VisualElement>
-        <ui:Label tabindex="-1" text="Label" display-tooltip-when-elided="true" name="outputLabel" style="margin-left: 4px;" />
+        <ui:Label tabindex="-1" display-tooltip-when-elided="true" name="outputLabel" style="margin-left: 4px;" />
     </ui:VisualElement>
 </ui:UXML>

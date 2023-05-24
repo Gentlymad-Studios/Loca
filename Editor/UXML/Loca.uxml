@@ -8,10 +8,14 @@
             <ui:VisualElement name="headerRight" style="background-color: rgba(0, 0, 0, 0); flex-grow: 1; flex-direction: row-reverse;">
                 <ui:Button display-tooltip-when-elided="true" name="settingsButton" class="iconBtn" />
                 <ui:Button display-tooltip-when-elided="true" name="refreshButton" class="iconBtn" />
+                <ui:Button display-tooltip-when-elided="true" tooltip="Open the Search Window" name="searchButton" class="iconBtn" />
                 <ui:Button text="Export to JSON" display-tooltip-when-elided="true" tooltip="Export Loca to JSON" name="exportButton" style="max-width: none; width: 125px;" />
                 <ui:Button text="Upload to Sheet" display-tooltip-when-elided="true" tooltip="Save Loca to Google Sheet" name="uploadButton" style="max-width: none; width: 125px;" />
                 <ui:Button text="Pull / Update" display-tooltip-when-elided="true" tooltip="Pull Loca from Google Sheet" name="pullButton" style="max-width: none; width: 125px;" />
-                <ui:Button text="Search" display-tooltip-when-elided="true" tooltip="Open the Search Window" name="searchButton" style="max-width: none; width: 125px;" />
+                <ui:TextField picking-mode="Ignore" name="filterTxtFld" style="width: 200px;">
+                    <ui:Button text="✕" display-tooltip-when-elided="true" name="clearFilterButton" style="position: absolute; background-color: rgba(188, 188, 188, 0); border-left-color: rgba(149, 149, 149, 0); border-right-color: rgba(149, 149, 149, 0); border-top-color: rgba(149, 149, 149, 0); border-bottom-color: rgba(149, 149, 149, 0); color: rgb(102, 102, 102); font-size: 12px; left: 90%; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; top: 15%;" />
+                    <ui:Label tabindex="-1" text="Filter..." display-tooltip-when-elided="true" name="filterPlaceholderLbl" style="position: absolute; font-size: 12px; margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; top: 21%; left: 2%; -unity-font-style: italic; color: rgb(102, 102, 102);" />
+                </ui:TextField>
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="tableRoot" style="flex-direction: column; flex-wrap: wrap; flex-grow: 1;">

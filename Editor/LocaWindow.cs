@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,13 +7,19 @@ namespace Loca {
     public class LocaWindow : EditorWindow {
         const string WINDOWNAME = "Loca Manager";
         private static LocaWindow window;
-        private SerializedObject serializedObject;
-        private Label statusLabel;
-        private LocaSubDatabase curDatabase;
-        private DropdownField databaseSelection;
-        private LocaSearchWindow searchWindow;
+
         public ScrollView scrollView;
         public MultiColumnListView table;
+        private SerializedObject serializedObject;
+        private Label statusLabel;
+        private TextField filterTxtFld;
+        private Label filterPlaceholderLbl;
+        private DropdownField databaseSelection;
+        private LocaSearchWindow searchWindow;
+
+        //Data
+        private LocaSubDatabase curDatabase;
+        private List<LocaEntry> tableEntries = new List<LocaEntry>();
 
         //Cache
         private VisualElement activeElement;
@@ -77,6 +82,19 @@ namespace Loca {
             statusLabel = rootVisualElement.Q("statusLabel") as Label;
             statusLabel.text = LocaBackgroundWorker.locaStatus;
 
+            //Filter TextField
+            filterTxtFld = rootVisualElement.Q("filterTxtFld") as TextField;
+            filterTxtFld.isDelayed = true;
+            filterTxtFld.UnregisterValueChangedCallback(FilterTextField_changed);
+            filterTxtFld.RegisterValueChangedCallback(FilterTextField_changed);
+            filterTxtFld.UnregisterCallback<FocusInEvent>(FilterFocusInEvent);
+            filterTxtFld.RegisterCallback<FocusInEvent>(FilterFocusInEvent);
+            filterTxtFld.UnregisterCallback<FocusOutEvent>(FilterFocusOutEvent);
+            filterTxtFld.RegisterCallback<FocusOutEvent>(FilterFocusOutEvent);
+
+            //Filter Placeholder Text
+            filterPlaceholderLbl = rootVisualElement.Q("filterPlaceholderLbl") as Label;
+
             //Un-/register Update
             EditorApplication.update -= OnUpdate;
             EditorApplication.update += OnUpdate;
@@ -112,9 +130,14 @@ namespace Loca {
             removeButton.clicked -= RemoveEntryButton_clicked;
             removeButton.clicked += RemoveEntryButton_clicked;
 
+            Button clearFilterButton = rootVisualElement.Q("clearFilterButton") as Button;
+            clearFilterButton.clicked -= ClearFilterTextField_clicked;
+            clearFilterButton.clicked += ClearFilterTextField_clicked;
+
             Button searchButton = rootVisualElement.Q("searchButton") as Button;
             searchButton.clicked -= SearchButton_clicked;
             searchButton.clicked += SearchButton_clicked;
+            searchButton.Add(new Image() { image = EditorGUIUtility.IconContent("d_Search Icon").image });
 
             //Link Dropdown
             databaseSelection = rootVisualElement.Q("databaseSelection") as DropdownField;
@@ -146,12 +169,13 @@ namespace Loca {
             }
 
             //Setup
+            FilterList(filterTxtFld.text);
+
             table.style.paddingRight = 17; //because of the vertical scrollbar
-            //table.showAddRemoveFooter = true;
             table.visible = true;
             table.showBorder = true;
             table.horizontalScrollingEnabled = true; //fixes the scale issues
-            table.itemsSource = curDatabase.locaEntries;
+            table.itemsSource = tableEntries; //curDatabase.locaEntries
             table.fixedItemHeight = fixedItemHeight;
             table.virtualizationMethod = CollectionVirtualizationMethod.FixedHeight;
             table.showAlternatingRowBackgrounds = AlternatingRowBackground.All;
@@ -191,9 +215,9 @@ namespace Loca {
 
                 Label label = e.Q<Label>();
                 label.userData = cellUserData;
-                label.text = curDatabase.locaEntries[index].key;
+                label.text = tableEntries[index].key;
 
-                if (curDatabase.locaEntries[index].hasKeyChanges) {
+                if (tableEntries[index].hasKeyChanges) {
                     label.style.color = LocaSettings.instance.hightlightColor;
                 } else {
                     label.style.color = StyleKeyword.Null;
@@ -220,12 +244,12 @@ namespace Loca {
 
                     Label label = e.Q<Label>();
                     label.userData = cellUserData;
-                    label.text = curDatabase.locaEntries[index].content[langIndex].content;
+                    label.text = tableEntries[index].content[langIndex].content;
 
                     TextField textField = e.Q<TextField>();
-                    textField.value = curDatabase.locaEntries[index].content[langIndex].content;
+                    textField.value = tableEntries[index].content[langIndex].content;
 
-                    if (curDatabase.locaEntries[index].content[langIndex].hasChanges) {
+                    if (tableEntries[index].content[langIndex].hasChanges) {
                         label.style.color = LocaSettings.instance.hightlightColor;
                     } else {
                         label.style.color = StyleKeyword.Null;
@@ -281,9 +305,9 @@ namespace Loca {
                 label.style.display = DisplayStyle.None;
                 textField.style.display = DisplayStyle.Flex;
                 if (cellUserData.languageIndex == -1) {
-                    textField.value = curDatabase.locaEntries[cellUserData.rowIndex].key;
+                    textField.value = tableEntries[cellUserData.rowIndex].key;
                 } else {
-                    textField.value = curDatabase.locaEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content;
+                    textField.value = tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content;
                 }
                 textField.Focus();
 
@@ -309,20 +333,20 @@ namespace Loca {
                         textField.Q<VisualElement>("unity-text-input").style.color = LocaSettings.instance.hightlightColor;
                     } else {
                         textField.Q<VisualElement>("unity-text-input").style.color = StyleKeyword.Null;
-                        curDatabase.locaEntries[cellUserData.rowIndex].key = evt.newValue;
-                        label.text = curDatabase.locaEntries[cellUserData.rowIndex].key;
+                        tableEntries[cellUserData.rowIndex].key = evt.newValue;
+                        label.text = tableEntries[cellUserData.rowIndex].key;
                     }
                     label.style.color = LocaSettings.instance.hightlightColor;
-                    curDatabase.locaEntries[cellUserData.rowIndex].hasKeyChanges = true;
-                    curDatabase.locaEntries[cellUserData.rowIndex].EntryUpdated();
+                    tableEntries[cellUserData.rowIndex].hasKeyChanges = true;
+                    tableEntries[cellUserData.rowIndex].EntryUpdated();
                     curDatabase.ClearEntriesMapping();
                 } else {
                     //Content
-                    curDatabase.locaEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content = evt.newValue;
-                    label.text = curDatabase.locaEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content;
+                    tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content = evt.newValue;
+                    label.text = tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content;
                     label.style.color = LocaSettings.instance.hightlightColor;
-                    curDatabase.locaEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].hasChanges = true;
-                    curDatabase.locaEntries[cellUserData.rowIndex].EntryUpdated();
+                    tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].hasChanges = true;
+                    tableEntries[cellUserData.rowIndex].EntryUpdated();
                 }
             }
         }
@@ -384,6 +408,31 @@ namespace Loca {
             }
             searchWindow.Focus();
         }
+
+        private void ClearFilterTextField_clicked() {
+            filterTxtFld.SetValueWithoutNotify(string.Empty);
+            filterPlaceholderLbl.style.display = DisplayStyle.Flex;
+            CreateMultiColumnListView();
+        }
+        #endregion
+
+        #region Misc Events
+        private void FilterFocusInEvent(FocusInEvent evt) {
+            filterPlaceholderLbl.style.display = DisplayStyle.None;
+        }
+
+        private void FilterFocusOutEvent(FocusOutEvent evt) {
+            if (string.IsNullOrEmpty(filterTxtFld.value) || string.IsNullOrWhiteSpace(filterTxtFld.value)) {
+                filterPlaceholderLbl.style.display = DisplayStyle.Flex;
+            } else {
+                filterPlaceholderLbl.style.display = DisplayStyle.None;
+            }
+        }
+
+        private void FilterTextField_changed(ChangeEvent<string> evt) {
+            FilterFocusOutEvent(null);
+            CreateMultiColumnListView();
+        }
         #endregion
 
         #region Database Selection Logic
@@ -435,8 +484,17 @@ namespace Loca {
                 searchWindow = null;
             }
 
+            filterTxtFld.SetValueWithoutNotify(string.Empty);
+            filterPlaceholderLbl.style.display = DisplayStyle.Flex;
+
             //Redraw ListView
             CreateMultiColumnListView();
+        }
+        #endregion
+
+        #region Filter List
+        private void FilterList(string filter) {
+            curDatabase.FillFilteredListOfEntries(filter, ref tableEntries);
         }
         #endregion
 

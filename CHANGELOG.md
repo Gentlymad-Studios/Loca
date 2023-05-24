@@ -42,3 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.9] - 2023-05-17
 ### Added
 - search window
+
+## [0.1.0] - 2023-05-24
+### Added
+- functionality to filter the shown LocaEntries

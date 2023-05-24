@@ -63,7 +63,6 @@ namespace Loca {
         private void Select(LocaSearchEntry entry) {
             locaWindow.table.SetSelection(entry.index);
             locaWindow.table.ScrollToItem(entry.index);
-            //locaWindow.scrollView.ScrollTo();
         }
     }
 }

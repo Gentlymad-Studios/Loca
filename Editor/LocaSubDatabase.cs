@@ -259,6 +259,23 @@ namespace Loca {
 
             return filteredEntries;
         }
+
+        /// <summary>
+        /// Fills the list with entries which keys contains the given term
+        /// </summary>
+        /// <param name="term"></param>
+        /// <param name="filteredEntries"></param>
+        public void FillFilteredListOfEntries(string term, ref List<LocaEntry> filteredEntries) {
+            filteredEntries.Clear();
+
+            term = term.ToLowerInvariant();
+
+            foreach (KeyValuePair<string, int> mapping in _locaEntriesMapping) {
+                if (mapping.Key.ToLowerInvariant().Contains(term)) {
+                    filteredEntries.Add(locaEntries[mapping.Value]);
+                }
+            }
+        }
         #endregion
 
         #region JSON Methods
