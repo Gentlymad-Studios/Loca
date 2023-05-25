@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine.UIElements;
 
 namespace Loca {
@@ -89,6 +90,16 @@ namespace Loca {
             }
 
             miscContent = newContent;
+        }
+
+        public bool IsComplete() {
+            for (int i = 0; i < content.Count; i++) {
+                if (string.IsNullOrEmpty(content[i].content) || string.IsNullOrWhiteSpace(content[i].content)) {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

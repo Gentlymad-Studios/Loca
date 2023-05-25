@@ -14,6 +14,7 @@ namespace Loca {
         private Label statusLabel;
         private TextField filterTxtFld;
         private Label filterPlaceholderLbl;
+        private Toggle emptyEntryFilterToggle;
         private DropdownField databaseSelection;
         private LocaSearchWindow searchWindow;
 
@@ -133,6 +134,10 @@ namespace Loca {
             Button clearFilterButton = rootVisualElement.Q("clearFilterButton") as Button;
             clearFilterButton.clicked -= ClearFilterTextField_clicked;
             clearFilterButton.clicked += ClearFilterTextField_clicked;
+
+            emptyEntryFilterToggle = rootVisualElement.Q("emptyEntryFilterTgl") as Toggle;
+            emptyEntryFilterToggle.UnregisterValueChangedCallback(EmptyEntryFilterToggle_changed);
+            emptyEntryFilterToggle.RegisterValueChangedCallback(EmptyEntryFilterToggle_changed);
 
             Button searchButton = rootVisualElement.Q("searchButton") as Button;
             searchButton.clicked -= SearchButton_clicked;
@@ -433,6 +438,10 @@ namespace Loca {
             FilterFocusOutEvent(null);
             CreateMultiColumnListView();
         }
+
+        private void EmptyEntryFilterToggle_changed(ChangeEvent<bool> evt) {
+            CreateMultiColumnListView();
+        }
         #endregion
 
         #region Database Selection Logic
@@ -494,7 +503,7 @@ namespace Loca {
 
         #region Filter List
         private void FilterList(string filter) {
-            curDatabase.FillFilteredListOfEntries(filter, ref tableEntries);
+            curDatabase.FillFilteredListOfEntries(filter, emptyEntryFilterToggle.value, ref tableEntries);
         }
         #endregion
 

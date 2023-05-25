@@ -265,14 +265,26 @@ namespace Loca {
         /// </summary>
         /// <param name="term"></param>
         /// <param name="filteredEntries"></param>
-        public void FillFilteredListOfEntries(string term, ref List<LocaEntry> filteredEntries) {
+        public void FillFilteredListOfEntries(string term, bool emptyOnly, ref List<LocaEntry> filteredEntries) {
             filteredEntries.Clear();
 
             term = term.ToLowerInvariant();
 
-            foreach (KeyValuePair<string, int> mapping in _locaEntriesMapping) {
-                if (mapping.Key.ToLowerInvariant().Contains(term)) {
-                    filteredEntries.Add(locaEntries[mapping.Value]);
+            if (emptyOnly) {
+                for (int i = 0; i < locaEntries.Count; i++) {
+                    LocaEntry entry = locaEntries[i];
+
+                    if (entry.key.ToLowerInvariant().Contains(term)) {
+                        if (!entry.IsComplete()) {
+                            filteredEntries.Add(locaEntries[i]);
+                        }
+                    }
+                }
+            } else {
+                foreach (KeyValuePair<string, int> mapping in _locaEntriesMapping) {
+                    if (mapping.Key.ToLowerInvariant().Contains(term)) {
+                        filteredEntries.Add(locaEntries[mapping.Value]);
+                    }
                 }
             }
         }
