@@ -55,3 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - add custom markups to the context menu of textfields
 - custom markups can now be configured inside the settings
+
+## [0.1.3] - 2023-05-30
+### Added
+- add public method to retrieve a LocaEntry by its key

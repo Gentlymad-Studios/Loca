@@ -199,6 +199,19 @@ namespace Loca {
         }
 
         /// <summary>
+        /// Return LocaEntry with the given key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public LocaEntry GetLocaEntry(string key) {
+            if (_locaEntriesMapping.TryGetValue(key.ToLowerInvariant(), out int index)) {
+                return locaEntries[index];
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Sort SubDatabase by Key
         /// </summary>
         /// <param name="sortedColumns"></param>
