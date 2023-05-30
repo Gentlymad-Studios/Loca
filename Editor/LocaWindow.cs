@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Loca {
@@ -203,12 +202,14 @@ namespace Loca {
 
                 //Label
                 Label label = new Label();
+                label.enableRichText = LocaSettings.instance.enableLabelRichText;
                 label.RegisterCallback<ClickEvent>(Clicked);
                 cell.Add(label);
 
                 //TextField
                 TextField textField = new TextField();
                 textField.multiline = true;
+                AddTextFieldContext(textField);
                 cell.Add(textField);
 
                 return cell;
@@ -504,6 +505,71 @@ namespace Loca {
         #region Filter List
         private void FilterList(string filter) {
             curDatabase.FillFilteredListOfEntries(filter, emptyEntryFilterToggle.value, ref tableEntries);
+        }
+        #endregion
+
+        #region TextField Context
+        private void AddTextFieldContext(TextField textField) {
+            textField.RegisterCallback<ContextualMenuPopulateEvent>((evt) =>
+            {
+                bool textSelected = textField.cursorIndex != textField.selectIndex;
+                evt.menu.AppendSeparator();
+                for (int i = 0; i < LocaSettings.instance.markups.Count; i++) {
+                    LocaSettings.Markup markup = LocaSettings.instance.markups[i];
+                    evt.menu.AppendAction($"add {markup.name}", (x) => InsertMarkup(textField, markup), textSelected ? DropdownMenuAction.AlwaysDisabled : DropdownMenuAction.AlwaysEnabled);
+                }
+
+                for (int i = 0; i < LocaSettings.instance.enclosedMarkups.Count; i++) {
+                    LocaSettings.EnclosedMarkup markup = LocaSettings.instance.enclosedMarkups[i];
+                    evt.menu.AppendAction($"add {markup.name}", (x) => InsertEnclosedMarkup(textField, markup), DropdownMenuAction.AlwaysEnabled);
+                }
+            });
+        }
+
+        private void InsertMarkup(TextField textField, LocaSettings.Markup markup) {
+            string text = textField.text;
+
+            //default markup
+
+            string tag = markup.tag;
+            text = text.Insert(textField.cursorIndex, tag);
+
+            //check for surrounding spaces
+            if (markup.surroundingSpace) {
+                //check for space after tag
+                if (text[textField.cursorIndex + tag.Length] != ' ') {
+                    text = text.Insert(textField.cursorIndex + tag.Length, " ");
+                }
+
+                //check for space before tag
+                if (text[textField.cursorIndex - 1] != ' ') {
+                    text = text.Insert(textField.cursorIndex, " ");
+                }
+            }
+
+            textField.value = text;
+            textField.SelectNone();
+        }
+
+        private void InsertEnclosedMarkup(TextField textField, LocaSettings.EnclosedMarkup markup) {
+            string text = textField.text;
+
+            string openingTag = markup.openingTag;
+            string closingTag = markup.closingTag;
+
+            int openingIndex = textField.cursorIndex;
+            int closingIndex = textField.selectIndex;
+
+            if (textField.selectIndex < textField.cursorIndex) {
+                openingIndex = textField.selectIndex;
+                closingIndex = textField.cursorIndex;
+            }
+
+            text = text.Insert(closingIndex, closingTag);
+            text = text.Insert(openingIndex, openingTag);
+
+            textField.value = text;
+            textField.SelectNone();
         }
         #endregion
 

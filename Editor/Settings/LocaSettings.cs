@@ -36,12 +36,19 @@ namespace Loca {
         public int initialColumnWidth = 300;
         [Tooltip("Fontcolor for changed Entries.")]
         public Color hightlightColor = Color.red;
+        [Tooltip("When false, richt tags will not be parsed for labels.")]
+        public bool enableLabelRichText = false;
 
         [Header("Search View Settings")]
         [Tooltip("GUID of the UXML File")]
         [SerializeField]
         private string searchUxmlIdentifier = "57a565a7e0944f84aa96db85d9a8d7dc";
         public static VisualTreeAsset searchUxml => AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath(instance.searchUxmlIdentifier));
+
+
+        [Header("Markups")]
+        public List<Markup> markups = new List<Markup>();
+        public List<EnclosedMarkup> enclosedMarkups = new List<EnclosedMarkup>();
 
         public void OnEnable() {
             hideFlags &= ~HideFlags.NotEditable;
@@ -117,6 +124,20 @@ namespace Loca {
             }
             private CultureInfo _language;
             public int columnIndex;
+        }
+
+        [Serializable]
+        public class Markup {
+            public string name;
+            public string tag;
+            public bool surroundingSpace = true;
+        }
+
+        [Serializable]
+        public class EnclosedMarkup {
+            public string name;
+            public string openingTag;
+            public string closingTag;
         }
 
         public void Save() {
