@@ -212,6 +212,20 @@ namespace Loca {
         }
 
         /// <summary>
+        /// Return LocaEntry with the given Hash
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        public LocaEntry GetLocaEntry(int hash) {
+            for (int i = 0; i < locaEntries.Count; i++) {
+                if (locaEntries[i].key.ToLowerInvariant().GetHashCode() == hash) {
+                    return locaEntries[i];
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Sort SubDatabase by Key
         /// </summary>
         /// <param name="sortedColumns"></param>

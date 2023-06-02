@@ -51,7 +51,19 @@ namespace Loca {
         }
 
         public void Search(ChangeEvent<string> evt) {
-            locaSearch.Search(evt.newValue);
+            string value = evt.newValue;
+
+            if (int.TryParse(value, out int hash)) {
+                locaSearch.Search(hash);
+
+                if (locaSearch.GetSearchEntryCount() == 1) {
+                    outputLabel.text = $"Entry '{locaSearch.Current().entry.key}' found";
+                    Select(locaSearch.Current());
+                    return;
+                }
+            }
+
+            locaSearch.Search(value);
 
             int entryCount = locaSearch.GetSearchEntryCount();
 
@@ -61,6 +73,10 @@ namespace Loca {
         }
 
         private void Select(LocaSearchEntry entry) {
+            if (entry == null) {
+                return;
+            }
+
             locaWindow.table.SetSelection(entry.index);
             locaWindow.table.ScrollToItem(entry.index);
         }

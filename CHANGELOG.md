@@ -59,3 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.3] - 2023-05-30
 ### Added
 - add public method to retrieve a LocaEntry by its key
+
+## [0.1.4] - 2023-06-02
+### Added
+- extend locasearch to search by hash

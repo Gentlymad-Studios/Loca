@@ -23,6 +23,17 @@ namespace Loca {
             }
         }
 
+        public void Search(int hash) {
+            current = 0;
+            entries.Clear();
+
+            LocaEntry entry = database.GetLocaEntry(hash);
+
+            if(entry != null) {
+                entries.Add(new LocaSearchEntry(entry, 0));
+            }
+        }
+
         public LocaSearchEntry Current() {
             if (entries.Count != 0) {
                 return entries[current];
