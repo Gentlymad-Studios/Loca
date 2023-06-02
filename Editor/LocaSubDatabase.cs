@@ -216,10 +216,10 @@ namespace Loca {
         /// </summary>
         /// <param name="hash"></param>
         /// <returns></returns>
-        public LocaEntry GetLocaEntry(int hash) {
+        public LocaSearchEntry GetLocaSearchEntryByHash(int hash) {
             for (int i = 0; i < locaEntries.Count; i++) {
                 if (locaEntries[i].key.ToLowerInvariant().GetHashCode() == hash) {
-                    return locaEntries[i];
+                    return new LocaSearchEntry(locaEntries[i], i);
                 }
             }
             return null;

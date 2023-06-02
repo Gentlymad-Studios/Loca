@@ -27,10 +27,10 @@ namespace Loca {
             current = 0;
             entries.Clear();
 
-            LocaEntry entry = database.GetLocaEntry(hash);
+            LocaSearchEntry entry = database.GetLocaSearchEntryByHash(hash);
 
             if(entry != null) {
-                entries.Add(new LocaSearchEntry(entry, 0));
+                entries.Add(entry);
             }
         }
 
