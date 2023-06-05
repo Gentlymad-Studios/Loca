@@ -162,7 +162,7 @@ namespace Loca {
         /// <param name="locaEntry"></param>
         public void RemoveLocaEntry(LocaEntry locaEntry) {
             locaEntries.Remove(locaEntry);
-            ClearEntriesMapping();
+            ClearEntriesMappingAndStorage();
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Loca {
 
             foreach (KeyValuePair<string, int> remove in mappingToRemove.Reverse()) {
                 locaEntries.RemoveAt(remove.Value);
-                ClearEntriesMapping();
+                ClearEntriesMappingAndStorage();
             }
         }
 
@@ -218,7 +218,7 @@ namespace Loca {
         /// <returns></returns>
         public LocaSearchEntry GetLocaSearchEntryByHash(int hash) {
             for (int i = 0; i < locaEntries.Count; i++) {
-                if (locaEntries[i].key.ToLowerInvariant().GetHashCode() == hash) {
+                if (locaEntries[i].Hash == hash) {
                     return new LocaSearchEntry(locaEntries[i], i);
                 }
             }
@@ -242,8 +242,9 @@ namespace Loca {
         /// <summary>
         /// Clear LocaEntriesMapping
         /// </summary>
-        public void ClearEntriesMapping() {
+        public void ClearEntriesMappingAndStorage() {
             locaEntriesMapping.Clear();
+            LocaKeyHashStorage.Clear();
         }
 
         /// <summary>
@@ -328,12 +329,12 @@ namespace Loca {
 
             for (int i = 0; i < locaEntries.Count; i++) {
 
-                if (jsonObject.translations.ContainsKey(locaEntries[i].key.ToLowerInvariant().GetHashCode())) {
-                    Debug.Log(jsonObject.translations[locaEntries[i].key.ToLowerInvariant().GetHashCode()]);
-                    Debug.Log(locaEntries[i].key.ToLowerInvariant().GetHashCode() + " - " + locaEntries[i].key);
+                if (jsonObject.translations.ContainsKey(locaEntries[i].Hash)) {
+                    Debug.Log(jsonObject.translations[locaEntries[i].Hash]);
+                    Debug.Log(locaEntries[i].Hash + " - " + locaEntries[i].key);
                 }
 
-                jsonObject.translations.Add(locaEntries[i].key.ToLowerInvariant().GetHashCode(), locaEntries[i].key);
+                jsonObject.translations.Add(locaEntries[i].Hash, locaEntries[i].key);
             }
 
             return jsonObject;
@@ -349,7 +350,7 @@ namespace Loca {
             jsonObject.translations = new Dictionary<int, string>();
 
             for (int i = 0; i < locaEntries.Count; i++) {
-                jsonObject.translations.Add(locaEntries[i].key.ToLowerInvariant().GetHashCode(), locaEntries[i].content[langIndex].content);
+                jsonObject.translations.Add(locaEntries[i].Hash, locaEntries[i].content[langIndex].content);
             }
 
             return jsonObject;
@@ -420,4 +421,5 @@ namespace Loca {
         }
         #endregion
     }
+
 }

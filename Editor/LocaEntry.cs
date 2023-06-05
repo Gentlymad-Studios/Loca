@@ -13,6 +13,12 @@ namespace Loca {
         public bool hasKeyChanges = false;
         public bool hasGlobalChanges = false;
 
+        public int Hash {
+            get {
+                return key.ToLowerInvariant().GetHashCode();
+            }
+        }
+
         [Serializable]
         public class LocaArray {
             public string languageKey;

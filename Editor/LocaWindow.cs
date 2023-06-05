@@ -345,7 +345,7 @@ namespace Loca {
                     label.style.color = LocaSettings.instance.hightlightColor;
                     tableEntries[cellUserData.rowIndex].hasKeyChanges = true;
                     tableEntries[cellUserData.rowIndex].EntryUpdated();
-                    curDatabase.ClearEntriesMapping();
+                    curDatabase.ClearEntriesMappingAndStorage();
                 } else {
                     //Content
                     tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content = evt.newValue;

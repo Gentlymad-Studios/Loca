@@ -63,3 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.4] - 2023-06-02
 ### Added
 - extend locasearch to search by hash
+
+## [0.1.5] - 2023-06-05
+### Added
+- add "hash <-> key" storage
