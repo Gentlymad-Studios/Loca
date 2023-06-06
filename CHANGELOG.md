@@ -71,3 +71,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.6] - 2023-06-06
 ### Added
 - add language option to the filter for uncomplete entries
+### Changed
+- labels are now full sized for a proper click event

@@ -214,6 +214,7 @@ namespace Loca {
                 //Label
                 Label label = new Label();
                 label.enableRichText = LocaSettings.instance.enableLabelRichText;
+                label.style.height = LocaSettings.instance.fixedRowHeight;
                 label.RegisterCallback<ClickEvent>(Clicked);
                 cell.Add(label);
 
