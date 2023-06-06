@@ -91,7 +91,7 @@ namespace Loca {
             return displayArray[index];
         }
 
-        public int GetHashFromString(string value) {
+        public static int GetHashFromString(string value) {
             for (int i = 0; i < displayArray.Length; i++) {
                 if (value == displayArray[i]) {
                     return GetHashFromIndex(i);
