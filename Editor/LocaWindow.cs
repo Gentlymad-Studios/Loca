@@ -8,7 +8,7 @@ using static UnityEditor.PlayerSettings.Switch;
 namespace Loca {
     public class LocaWindow : EditorWindow {
         const string WINDOWNAME = "Loca Manager";
-        private static LocaWindow window;
+        public static LocaWindow window;
 
         public ScrollView scrollView;
         public MultiColumnListView table;
