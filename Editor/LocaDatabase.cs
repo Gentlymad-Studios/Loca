@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 
 namespace Loca {
@@ -85,7 +86,7 @@ namespace Loca {
         }
 
         /// <summary>
-        /// Returns a list of entries which keys contains the given term un all databases
+        /// Returns a list of entries which keys contains the given term in all databases
         /// </summary>
         /// <param name="term"></param>
         /// <returns></returns>
@@ -97,6 +98,24 @@ namespace Loca {
             }
             
             return filteredEntries;
+        }
+
+        /// <summary>
+        /// Returns a list of all languages in all databases
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetAllUsedLanguages() {
+            List<string> allLanguages = new List<string>();
+
+            for (int i = 0; i < databases.Count; i++) {
+                for (int j = 0; j < databases[i].languages.Count; j++) {
+                    if (!allLanguages.Contains(databases[i].languages[j])) {
+                        allLanguages.Add(databases[i].languages[j]);
+                    }
+                }
+            }
+
+            return allLanguages;
         }
 
         /// <summary>
