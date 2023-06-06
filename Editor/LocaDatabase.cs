@@ -69,6 +69,22 @@ namespace Loca {
         }
 
         /// <summary>
+        /// Return the First LocaEntry found in all Databases
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public LocaEntry GetLocaEntry(string key) {
+            for (int i = 0; i < databases.Count; i++) {
+                LocaEntry entry = databases[i].GetLocaEntry(key);
+                if (entry != null) {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Remove old Databases (Sheets) based on the newly polled databases
         /// </summary>
         /// <param name="newDatabases">new databases</param>
