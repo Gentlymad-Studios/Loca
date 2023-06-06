@@ -107,5 +107,15 @@ namespace Loca {
 
             return true;
         }
+
+        public LocaArray GetContentByLanguageKey(string languageKey) {
+            for (int i = 0; i < content.Count; i++) {
+                if (content[i].languageKey == languageKey) {
+                    return content[i];
+                }
+            }
+
+            return null;
+        }
     }
 }
