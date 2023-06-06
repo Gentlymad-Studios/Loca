@@ -514,6 +514,7 @@ namespace Loca {
         /// <param name="database">Database to show</param>
         public void SelectDatabase(LocaSubDatabase database) {
             curDatabase = database;
+            databaseSelection.SetValueWithoutNotify(database.sheetName);
 
             if (searchWindow != null) {
                 searchWindow.Close();

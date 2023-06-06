@@ -61,7 +61,7 @@ namespace Loca {
         }
 
         /// <summary>
-        /// Upade this SubDatabase from the given new one
+        /// Update this SubDatabase from the given new one
         /// </summary>
         /// <param name="newSubDatabase">new SubDatabase</param>
         public void Update(LocaSubDatabase newSubDatabase) {
@@ -185,8 +185,9 @@ namespace Loca {
 
             foreach (KeyValuePair<string, int> remove in mappingToRemove.Reverse()) {
                 locaEntries.RemoveAt(remove.Value);
-                ClearEntriesMappingAndStorage();
             }
+
+            ClearEntriesMappingAndStorage();
         }
 
         #region Utils
