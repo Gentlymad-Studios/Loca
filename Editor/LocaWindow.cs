@@ -505,13 +505,23 @@ namespace Loca {
             selectedDatabaseName = evt.newValue;
             selectedDatabaseIndex = databaseSelection.index;
 
-            curDatabase = LocaDatabase.instance.databases[databaseSelection.index];
+            SelectDatabase(LocaDatabase.instance.databases[databaseSelection.index]);
+        }
+
+        /// <summary>
+        /// Set Visible Database
+        /// </summary>
+        /// <param name="database">Database to show</param>
+        public void SelectDatabase(LocaSubDatabase database) {
+            curDatabase = database;
 
             if (searchWindow != null) {
                 searchWindow.Close();
                 searchWindow = null;
             }
 
+            emptyEntryFilterToggle.SetValueWithoutNotify(false);
+            emptyEntryFilterLanguageSelection.SetValueWithoutNotify("All Languages");
             filterTxtFld.SetValueWithoutNotify(string.Empty);
             filterPlaceholderLbl.style.display = DisplayStyle.Flex;
 
