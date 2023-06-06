@@ -293,7 +293,7 @@ namespace Loca {
         /// </summary>
         /// <param name="term"></param>
         /// <param name="filteredEntries"></param>
-        public void FillFilteredListOfEntries(string term, bool emptyOnly, ref List<LocaEntry> filteredEntries) {
+        public void FillFilteredListOfEntries(string term, bool emptyOnly, string language, ref List<LocaEntry> filteredEntries) {
             filteredEntries.Clear();
 
             term = term.ToLowerInvariant();
@@ -303,7 +303,7 @@ namespace Loca {
                     LocaEntry entry = locaEntries[i];
 
                     if (entry.key.ToLowerInvariant().Contains(term)) {
-                        if (!entry.IsComplete()) {
+                        if (!entry.IsComplete(language)) {
                             filteredEntries.Add(locaEntries[i]);
                         }
                     }

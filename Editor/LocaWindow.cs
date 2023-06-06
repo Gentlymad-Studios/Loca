@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
+using static UnityEditor.PlayerSettings.Switch;
 
 namespace Loca {
     public class LocaWindow : EditorWindow {
@@ -15,6 +18,7 @@ namespace Loca {
         private Label filterPlaceholderLbl;
         private Toggle emptyEntryFilterToggle;
         private DropdownField databaseSelection;
+        private DropdownField emptyEntryFilterLanguageSelection;
         private LocaSearchWindow searchWindow;
 
         //Data
@@ -138,6 +142,10 @@ namespace Loca {
             emptyEntryFilterToggle.UnregisterValueChangedCallback(EmptyEntryFilterToggle_changed);
             emptyEntryFilterToggle.RegisterValueChangedCallback(EmptyEntryFilterToggle_changed);
 
+            emptyEntryFilterLanguageSelection = rootVisualElement.Q("emptyEntryFilterLanguageSelection") as DropdownField;
+            emptyEntryFilterLanguageSelection.UnregisterValueChangedCallback(EmptyEntryLanguage_changed);
+            emptyEntryFilterLanguageSelection.RegisterValueChangedCallback(EmptyEntryLanguage_changed);
+
             Button searchButton = rootVisualElement.Q("searchButton") as Button;
             searchButton.clicked -= SearchButton_clicked;
             searchButton.clicked += SearchButton_clicked;
@@ -145,8 +153,11 @@ namespace Loca {
 
             //Link Dropdown
             databaseSelection = rootVisualElement.Q("databaseSelection") as DropdownField;
-            databaseSelection.RegisterValueChangedCallback(DropdownChange);
+            databaseSelection.UnregisterValueChangedCallback(DatabaseSelection_changed);
+            databaseSelection.RegisterValueChangedCallback(DatabaseSelection_changed);
             SetupDatabaseSelection();
+
+            SetupFilterLanguage();
 
             CreateMultiColumnListView();
         }
@@ -422,7 +433,7 @@ namespace Loca {
         }
         #endregion
 
-        #region Misc Events
+        #region Filter Events
         private void FilterFocusInEvent(FocusInEvent evt) {
             filterPlaceholderLbl.style.display = DisplayStyle.None;
         }
@@ -442,6 +453,12 @@ namespace Loca {
 
         private void EmptyEntryFilterToggle_changed(ChangeEvent<bool> evt) {
             CreateMultiColumnListView();
+        }
+
+        private void EmptyEntryLanguage_changed(ChangeEvent<string> evt) {
+            if (emptyEntryFilterToggle.value) {
+                CreateMultiColumnListView();
+            }
         }
         #endregion
 
@@ -483,7 +500,7 @@ namespace Loca {
         /// Dropdown Change Event
         /// </summary>
         /// <param name="evt"></param>
-        private void DropdownChange(ChangeEvent<string> evt) {
+        private void DatabaseSelection_changed(ChangeEvent<string> evt) {
             selectedDatabaseName = evt.newValue;
             selectedDatabaseIndex = databaseSelection.index;
 
@@ -499,12 +516,20 @@ namespace Loca {
 
             //Redraw ListView
             CreateMultiColumnListView();
+            SetupFilterLanguage();
         }
         #endregion
 
-        #region Filter List
+        #region Filter Logic
         private void FilterList(string filter) {
-            curDatabase.FillFilteredListOfEntries(filter, emptyEntryFilterToggle.value, ref tableEntries);
+            curDatabase.FillFilteredListOfEntries(filter, emptyEntryFilterToggle.value, emptyEntryFilterLanguageSelection.value, ref tableEntries);
+        }
+
+        private void SetupFilterLanguage() {
+            List<string> languageChoices = new List<string> { "All Languages" };
+            languageChoices.AddRange(curDatabase.languages);
+            emptyEntryFilterLanguageSelection.choices = languageChoices;
+            emptyEntryFilterLanguageSelection.value = "All Languages";
         }
         #endregion
 

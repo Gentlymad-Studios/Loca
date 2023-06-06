@@ -67,3 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.5] - 2023-06-05
 ### Added
 - add "hash <-> key" storage
+
+## [0.1.6] - 2023-06-06
+### Added
+- add language option to the filter for uncomplete entries

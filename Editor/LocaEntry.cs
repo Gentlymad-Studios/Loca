@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using UnityEngine.UIElements;
 
 namespace Loca {
     [Serializable]
@@ -98,10 +96,12 @@ namespace Loca {
             miscContent = newContent;
         }
 
-        public bool IsComplete() {
+        public bool IsComplete(string languages) {
             for (int i = 0; i < content.Count; i++) {
-                if (string.IsNullOrEmpty(content[i].content) || string.IsNullOrWhiteSpace(content[i].content)) {
-                    return false;
+                if (languages == "All Languages" || languages == content[i].languageKey) {
+                    if (string.IsNullOrEmpty(content[i].content) || string.IsNullOrWhiteSpace(content[i].content)) {
+                        return false;
+                    }
                 }
             }
 
