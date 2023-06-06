@@ -130,6 +130,7 @@ namespace Loca {
 
                 locaEntries.Add(locaEntry);
                 locaEntriesMapping.Add(locaEntry.key.ToLowerInvariant(), locaEntries.Count - 1);
+                LocaKeyHashStorage.Clear();
             }
         }
 
