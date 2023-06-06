@@ -220,7 +220,7 @@ namespace Loca {
         public LocaSearchEntry GetLocaSearchEntryByHash(int hash) {
             for (int i = 0; i < locaEntries.Count; i++) {
                 if (locaEntries[i].Hash == hash) {
-                    return new LocaSearchEntry(locaEntries[i], i);
+                    return new LocaSearchEntry(this, locaEntries[i], i);
                 }
             }
             return null;
@@ -282,7 +282,7 @@ namespace Loca {
 
             foreach (KeyValuePair<string, int> mapping in _locaEntriesMapping) {
                 if (mapping.Key.ToLowerInvariant().Contains(term)) {
-                    filteredEntries.Add(new LocaSearchEntry(locaEntries[mapping.Value], mapping.Value));
+                    filteredEntries.Add(new LocaSearchEntry(this, locaEntries[mapping.Value], mapping.Value));
                 }
             }
 

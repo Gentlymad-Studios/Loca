@@ -69,7 +69,7 @@ namespace Loca {
         }
 
         /// <summary>
-        /// Return the First LocaEntry found in all Databases
+        /// Return the First LocaEntry found in all databases
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -82,6 +82,21 @@ namespace Loca {
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Returns a list of entries which keys contains the given term un all databases
+        /// </summary>
+        /// <param name="term"></param>
+        /// <returns></returns>
+        public List<LocaSearchEntry> GetFilteredListOfEntries(string term) {
+            List<LocaSearchEntry> filteredEntries = new List<LocaSearchEntry>();
+
+            for (int i = 0; i < databases.Count; i++) {
+                filteredEntries.AddRange(databases[i].GetFilteredListOfEntries(term));
+            }
+            
+            return filteredEntries;
         }
 
         /// <summary>
