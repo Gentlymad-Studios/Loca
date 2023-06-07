@@ -611,6 +611,23 @@ namespace Loca {
         #endregion
 
         #region Helper
+        /// <summary>
+        /// Opens the LocaManager and select the first LocaEntry with the given key
+        /// </summary>
+        /// <param name="key">Key of the LocaEntry</param>
+        public static void OpenWindowAt(string key) {
+            if (window == null) {
+                Initialize();
+            }
+
+            List<LocaSearchEntry> entries = LocaDatabase.instance.GetFilteredListOfEntries(key);
+            if (entries.Count != 0) {
+                window.SelectDatabase(entries[0].database);
+                window.table.SetSelection(entries[0].index);
+                window.table.ScrollToItem(entries[0].index);
+            }
+        }
+
         class CellUserData {
             public int rowIndex;
             public int languageIndex;

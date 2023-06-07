@@ -70,9 +70,39 @@ namespace Loca {
         }
 
         /// <summary>
+        /// Remove old Databases (Sheets) based on the newly polled databases
+        /// </summary>
+        /// <param name="newDatabases">new databases</param>
+        private void CleanupOldDatabases(List<LocaSubDatabase> newDatabases) {
+            List<LocaSubDatabase> oldDatabases = new List<LocaSubDatabase>();
+
+            //Check if the current databases already exists in our update
+            for (int i = 0; i < databases.Count; i++) {
+                bool isOld = true;
+
+                for (int j = 0; j < newDatabases.Count; j++) {
+                    if (databases[i].sheetName == newDatabases[j].sheetName) {
+                        isOld = false;
+                        break;
+                    }
+                }
+
+                if (isOld) {
+                    oldDatabases.Add(databases[i]);
+                }
+            }
+
+            //Remove the old ones
+            for (int i = 0; i < oldDatabases.Count; i++) {
+                databases.Remove(oldDatabases[i]);
+            }
+        }
+
+        #region Utils
+        /// <summary>
         /// Return the First LocaEntry found in all databases
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">Key of the Entry</param>
         /// <returns></returns>
         public LocaEntry GetLocaEntry(string key) {
             for (int i = 0; i < databases.Count; i++) {
@@ -83,6 +113,59 @@ namespace Loca {
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Rename LocaEntry with the given name
+        /// </summary>
+        /// <param name="oldName">current name</param>
+        /// <param name="newName">new name</param>
+        /// <returns>true if an entry was renamed</returns>
+        public bool RenameLocaEntry(string oldName, string newName) {
+            bool hasChanges = false;
+
+            for (int i = 0; i < databases.Count; i++) {
+                LocaSubDatabase database = databases[i];
+
+                if (database.KeyExists(newName)) {
+                    //...new key already exists
+                    continue;
+                }
+
+                if (database.KeyExists(oldName)) {
+                    for (int j = 0; j < database.locaEntries.Count; j++) {
+                        LocaEntry entry = database.locaEntries[j];
+
+                        //find the key
+                        if (oldName.ToLowerInvariant() == entry.key.ToLowerInvariant()) {
+                            entry.key = newName;
+                            entry.hasKeyChanges = true;
+                            entry.EntryUpdated();
+
+                            hasChanges = true;
+
+                            database.ClearEntriesMappingAndStorage();
+                        }
+                    }
+                }
+            }
+
+            return hasChanges;
+        }
+
+        /// <summary>
+        /// Create a new LocaEntry with the given key and adds it to the first database or optional to the given one
+        /// </summary>
+        /// <param name="key">Key of the Entry</param>
+        /// <param name="database">Optional: database we want to add the LocaEntry to</param>
+        public void CreateLocaEntry(string key, LocaSubDatabase database = null) {
+            LocaEntry locaEntry = new LocaEntry() { key = key };
+
+            if (database == null) {
+                databases[0].AddLocaEntry(locaEntry);
+            } else {
+                database.AddLocaEntry(locaEntry);
+            }
         }
 
         /// <summary>
@@ -117,34 +200,7 @@ namespace Loca {
 
             return allLanguages;
         }
+        #endregion
 
-        /// <summary>
-        /// Remove old Databases (Sheets) based on the newly polled databases
-        /// </summary>
-        /// <param name="newDatabases">new databases</param>
-        private void CleanupOldDatabases(List<LocaSubDatabase> newDatabases) {
-            List<LocaSubDatabase> oldDatabases = new List<LocaSubDatabase>();
-
-            //Check if the current databases already exists in our update
-            for (int i = 0; i < databases.Count; i++) {
-                bool isOld = true;
-
-                for (int j = 0; j < newDatabases.Count; j++) {
-                    if (databases[i].sheetName == newDatabases[j].sheetName) {
-                        isOld = false;
-                        break;
-                    }
-                }
-
-                if (isOld) {
-                    oldDatabases.Add(databases[i]);
-                }
-            }
-
-            //Remove the old ones
-            for (int i = 0; i < oldDatabases.Count; i++) {
-                databases.Remove(oldDatabases[i]);
-            }
-        }
     }
 }

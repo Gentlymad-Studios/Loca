@@ -73,3 +73,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add language option to the filter for uncomplete entries
 ### Changed
 - labels are now full sized for a proper click event
+
+## [0.1.7] - 2023-06-07
+### Added
+- add method to open the locamanager at a given position / key
+- add method to create a new locaentry by key
+- add method to rename a locaentry
