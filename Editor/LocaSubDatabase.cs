@@ -330,6 +330,10 @@ namespace Loca {
             jsonObject.translations = new Dictionary<int, string>();
 
             for (int i = 0; i < locaEntries.Count; i++) {
+                if (string.IsNullOrEmpty(locaEntries[i].key)) {
+                    Debug.LogError(locaEntries[i].Hash + " has an no Key and was skipped!");
+                    continue;
+                }
 
                 if (jsonObject.translations.ContainsKey(locaEntries[i].Hash)) {
                     Debug.Log(jsonObject.translations[locaEntries[i].Hash]);
@@ -352,6 +356,11 @@ namespace Loca {
             jsonObject.translations = new Dictionary<int, string>();
 
             for (int i = 0; i < locaEntries.Count; i++) {
+                if (string.IsNullOrEmpty(locaEntries[i].key)) {
+                    Debug.LogError(locaEntries[i].Hash + " has an no Key and was skipped!");
+                    continue;
+                }
+
                 jsonObject.translations.Add(locaEntries[i].Hash, locaEntries[i].content[langIndex].content);
             }
 

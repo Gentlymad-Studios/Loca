@@ -79,3 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add method to open the locamanager at a given position / key
 - add method to create a new locaentry by key
 - add method to rename a locaentry
+
+## [0.1.8] - 2023-08-28
+### Fixed
+- filter empty keys on export
