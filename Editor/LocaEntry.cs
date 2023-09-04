@@ -108,6 +108,20 @@ namespace Loca {
             return true;
         }
 
+        public bool ContentContains(string languages, string value) {
+            string lowerValue = value.ToLowerInvariant();
+
+            for (int i = 0; i < content.Count; i++) {
+                if (languages == "All Languages" || languages == content[i].languageKey) {
+                    if (content[i].content.ToLowerInvariant().Contains(lowerValue)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public LocaArray GetContentByLanguageKey(string languageKey) {
             for (int i = 0; i < content.Count; i++) {
                 if (content[i].languageKey == languageKey) {

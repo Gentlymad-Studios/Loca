@@ -83,3 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.8] - 2023-08-28
 ### Fixed
 - filter empty keys on export
+
+## [0.1.9] - 2023-09-04
+### Added
+- filteroption now filters content too

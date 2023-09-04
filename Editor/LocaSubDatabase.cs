@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Loca {
     [Serializable]
@@ -300,20 +301,16 @@ namespace Loca {
 
             term = term.ToLowerInvariant();
 
-            if (emptyOnly) {
-                for (int i = 0; i < locaEntries.Count; i++) {
-                    LocaEntry entry = locaEntries[i];
+            for (int i = 0; i < locaEntries.Count; i++) {
+                LocaEntry entry = locaEntries[i];
 
-                    if (entry.key.ToLowerInvariant().Contains(term)) {
-                        if (!entry.IsComplete(language)) {
-                            filteredEntries.Add(locaEntries[i]);
-                        }
+                if (entry.key.ToLowerInvariant().Contains(term)) {
+                    if (!emptyOnly || !entry.IsComplete(language)) {
+                        filteredEntries.Add(locaEntries[i]);
                     }
-                }
-            } else {
-                foreach (KeyValuePair<string, int> mapping in _locaEntriesMapping) {
-                    if (mapping.Key.ToLowerInvariant().Contains(term)) {
-                        filteredEntries.Add(locaEntries[mapping.Value]);
+                } else if (entry.ContentContains(language, term)) {
+                    if (!emptyOnly || !entry.IsComplete(language)) {
+                        filteredEntries.Add(locaEntries[i]);
                     }
                 }
             }
