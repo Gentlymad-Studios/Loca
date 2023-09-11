@@ -140,7 +140,7 @@ namespace Loca {
         /// </summary>
         /// <param name="key"></param>
         public bool CreateLocaEntry(string key) {
-            if (!KeyExists(key)) {
+            if (!KeyExists(key) && !string.IsNullOrEmpty(key)) {
                 //create new one
                 LocaEntry locaEntry = new LocaEntry();
                 locaEntry.key = key.ToLowerInvariant();
