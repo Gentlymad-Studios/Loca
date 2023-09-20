@@ -91,3 +91,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2023-09-11
 ### Fixed
 - fixed Add Entry cancel behavior
+
+## [0.2.1] - 2023-09-20
+### Changed
+- Add LocaEntry Window now opens in the center with focus on the input field
