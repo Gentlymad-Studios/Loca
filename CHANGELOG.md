@@ -95,3 +95,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.1] - 2023-09-20
 ### Changed
 - Add LocaEntry Window now opens in the center with focus on the input field
+
+## [0.2.2] - 2023-09-26
+### Added
+- Markups now highligthed in if the richtext mode is enabled
+- Show changes in the close dialog 
+### Fixed
+- Fixed wrong paste behavior

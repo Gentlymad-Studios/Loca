@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
-using static UnityEditor.PlayerSettings.Switch;
 
 namespace Loca {
     public class LocaWindow : EditorWindow {
@@ -65,7 +64,17 @@ namespace Loca {
             LocaDatabase.instance.Save();
 
             if (LocaDatabase.instance.hasLocalChanges) {
-                bool decision = EditorUtility.DisplayDialog("Unsaved Changes", "You have changes that have not been updated in the Google spreadsheet. Do you want to update the Google spreadsheet?", "Yes", "No (keep the changes local)");
+                int changesLimit = 50;
+
+                List<string> changes = LocaDatabase.instance.GetChanges();
+                if (changes.Count > changesLimit) {
+                    changes.RemoveRange(changesLimit, changes.Count - changesLimit);
+                    changes.Add("...");
+                }
+
+                string changesString = string.Join("\n", changes.ToArray());
+
+                bool decision = EditorUtility.DisplayDialog("Unsaved Changes", $"You have changes that have not been updated in the Google spreadsheet. Do you want to update the Google spreadsheet?\n\nEntries changed:\n" + changesString, "Yes", "No (keep the changes local)");
 
                 if (decision) {
                     //Save to Google Sheet
@@ -237,8 +246,10 @@ namespace Loca {
 
                 if (tableEntries[index].hasKeyChanges) {
                     label.style.color = LocaSettings.instance.hightlightColor;
+                    label.style.unityFontStyleAndWeight = FontStyle.Italic;
                 } else {
                     label.style.color = StyleKeyword.Null;
+                    label.style.unityFontStyleAndWeight = StyleKeyword.Null;
                 }
             }
 
@@ -262,15 +273,21 @@ namespace Loca {
 
                     Label label = e.Q<Label>();
                     label.userData = cellUserData;
-                    label.text = tableEntries[index].content[langIndex].content;
+                    if (label.enableRichText) {
+                        label.text = HighlightTextMarkups(tableEntries[index].content[langIndex].content);
+                    } else {
+                        label.text = tableEntries[index].content[langIndex].content;
+                    }
 
                     TextField textField = e.Q<TextField>();
                     textField.value = tableEntries[index].content[langIndex].content;
 
                     if (tableEntries[index].content[langIndex].hasChanges) {
                         label.style.color = LocaSettings.instance.hightlightColor;
+                        label.style.unityFontStyleAndWeight = FontStyle.Italic;
                     } else {
                         label.style.color = StyleKeyword.Null;
+                        label.style.unityFontStyleAndWeight = StyleKeyword.Null;
                     }
                 }
 
@@ -344,28 +361,37 @@ namespace Loca {
 
             CellUserData cellUserData = (CellUserData)label.userData;
 
-            if (!string.IsNullOrEmpty(evt.previousValue)) {
-                if (cellUserData.languageIndex == -1) {
-                    //Key
-                    if (curDatabase.KeyExists(evt.newValue)) {
-                        textField.Q<VisualElement>("unity-text-input").style.color = LocaSettings.instance.hightlightColor;
-                    } else {
-                        textField.Q<VisualElement>("unity-text-input").style.color = StyleKeyword.Null;
-                        tableEntries[cellUserData.rowIndex].key = evt.newValue;
-                        label.text = tableEntries[cellUserData.rowIndex].key;
-                    }
-                    label.style.color = LocaSettings.instance.hightlightColor;
-                    tableEntries[cellUserData.rowIndex].hasKeyChanges = true;
-                    tableEntries[cellUserData.rowIndex].EntryUpdated();
-                    curDatabase.ClearEntriesMappingAndStorage();
+            if (cellUserData.languageIndex == -1) {
+                //Key
+                if (curDatabase.KeyExists(evt.newValue)) {
+                    textField.Q<VisualElement>("unity-text-input").style.color = LocaSettings.instance.hightlightColor;
                 } else {
-                    //Content
-                    tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content = evt.newValue;
-                    label.text = tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content;
-                    label.style.color = LocaSettings.instance.hightlightColor;
-                    tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].hasChanges = true;
-                    tableEntries[cellUserData.rowIndex].EntryUpdated();
+                    textField.Q<VisualElement>("unity-text-input").style.color = StyleKeyword.Null;
+                    tableEntries[cellUserData.rowIndex].key = evt.newValue;
+                    label.text = tableEntries[cellUserData.rowIndex].key;
                 }
+
+                label.style.color = LocaSettings.instance.hightlightColor;
+                label.style.unityFontStyleAndWeight = FontStyle.Italic;
+
+                tableEntries[cellUserData.rowIndex].hasKeyChanges = true;
+                tableEntries[cellUserData.rowIndex].EntryUpdated();
+                curDatabase.ClearEntriesMappingAndStorage();
+            } else {
+                //Content
+                tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content = evt.newValue;
+
+                if (label.enableRichText) {
+                    label.text = HighlightTextMarkups(tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content);
+                } else {
+                    label.text = tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content;
+                }
+
+                label.style.color = LocaSettings.instance.hightlightColor;
+                label.style.unityFontStyleAndWeight = FontStyle.Italic;
+
+                tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].hasChanges = true;
+                tableEntries[cellUserData.rowIndex].EntryUpdated();
             }
         }
 
@@ -547,8 +573,7 @@ namespace Loca {
 
         #region TextField Context
         private void AddTextFieldContext(TextField textField) {
-            textField.RegisterCallback<ContextualMenuPopulateEvent>((evt) =>
-            {
+            textField.RegisterCallback<ContextualMenuPopulateEvent>((evt) => {
                 bool textSelected = textField.cursorIndex != textField.selectIndex;
                 evt.menu.AppendSeparator();
                 for (int i = 0; i < LocaSettings.instance.markups.Count; i++) {
@@ -626,6 +651,30 @@ namespace Loca {
                 window.table.SetSelection(entries[0].index);
                 window.table.ScrollToItem(entries[0].index);
             }
+        }
+
+        /// <summary>
+        /// Hightlight the Markups
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        private static string HighlightTextMarkups(string text) {
+            for (int i = 0; i < LocaSettings.instance.markups.Count; i++) {
+                LocaSettings.Markup markup = LocaSettings.instance.markups[i];
+
+                text = text.Replace(markup.tag, $"<color=#{ColorUtility.ToHtmlStringRGB(markup.highlighting)}>{markup.tag}</color>");
+            }
+
+            for (int i = 0; i < LocaSettings.instance.enclosedMarkups.Count; i++) {
+                LocaSettings.EnclosedMarkup encMarkup = LocaSettings.instance.enclosedMarkups[i];
+
+                if (text.Contains(encMarkup.openingTag)) {
+                    text = text.Replace(encMarkup.openingTag, $"<color=#{ColorUtility.ToHtmlStringRGB(encMarkup.highlighting)}>");
+                    text = text.Replace(encMarkup.closingTag, $"</color>");
+                }
+            }
+
+            return text;
         }
 
         class CellUserData {

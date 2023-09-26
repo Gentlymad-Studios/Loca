@@ -130,7 +130,10 @@ namespace Loca {
         public class Markup {
             public string name;
             public string tag;
+            [Tooltip("Creates spaces around the Markup when inserted.")]
             public bool surroundingSpace = true;
+            [Tooltip("The color the markup is highlighted in the Loca Manager. Only visible if the Rich Text for the Labels is enabled.")]
+            public Color highlighting;
         }
 
         [Serializable]
@@ -138,6 +141,8 @@ namespace Loca {
             public string name;
             public string openingTag;
             public string closingTag;
+            [Tooltip("The color the markup is highlighted in the Loca Manager. Only visible if the Rich Text for the Labels is enabled.")]
+            public Color highlighting;
         }
 
         public void Save() {

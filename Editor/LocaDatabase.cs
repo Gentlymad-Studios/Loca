@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -200,7 +201,28 @@ namespace Loca {
 
             return allLanguages;
         }
-        #endregion
 
+        /// <summary>
+        /// Returns a list with all keys that got changes 
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetChanges() {
+            List<string> changes = new List<string>();
+
+            for (int i = 0; i < databases.Count; i++) {
+                for (int j = 0; j < databases[i].locaEntries.Count; j++) {
+                    if (databases[i].locaEntries[j].hasGlobalChanges) {
+                        if (databases.Count > 1) {
+                            changes.Add($"[{databases[i].sheetName}] {databases[i].locaEntries[j].key}");
+                        } else {
+                            changes.Add(databases[i].locaEntries[j].key);
+                        }
+                    }
+                }
+            }
+
+            return changes;
+        }
+        #endregion
     }
 }
