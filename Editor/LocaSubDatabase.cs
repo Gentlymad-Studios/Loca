@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Loca {
     [Serializable]
     public class LocaSubDatabase {
+        public bool isReadOnly;
+        public string name = "Main";
         public string sheetName;
 
         public List<string> languages = new List<string>();
@@ -32,7 +33,7 @@ namespace Loca {
             }
         }
 
-        public bool ExtractHeaderData(HeaderData headerData) {
+        public bool ExtractHeaderData(HeaderData headerData, bool useTimestamp) {
             bool success = true;
 
             keyColumnIndex = headerData.keyColumnIndex;
@@ -53,7 +54,7 @@ namespace Loca {
                 success = false;
             }
 
-            if (timestampColumnIndex == -1) {
+            if (timestampColumnIndex == -1 && useTimestamp) {
                 Debug.LogWarning($"Unable to find {LocaSettings.instance.headerSettings.timestampColumnName} column in sheet {sheetName}");
                 success = false;
             }

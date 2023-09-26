@@ -62,11 +62,11 @@ namespace Loca {
 
         [Serializable]
         public class GoogleDataSettings {
+            [Header("Read/Write Spreadsheet")]
             [Tooltip("Secrets for the google access. Google Account need Access to Spreadsheets and the Drive. A restart or recompile may be required.")]
             [TextArea]
             public string secret = "";
 
-            [Header("Spreadsheet")]
             [Tooltip("ID of the Spreadsheet you want to Access")]
             public string spreadsheetId = "";
 
@@ -79,6 +79,12 @@ namespace Loca {
             [Tooltip("Request URL to set the LastModified Date of the given Spreadsheet.")]
             public string spreadsheetSetLastModifiedRequest = "";
 
+            [Header("ReadOnly Spreadsheets")]
+            [Tooltip("API Key to Access the Google Sheets API")]
+            public string apikey = "";
+            [Tooltip("ReadOnly Spreadsheets")]
+            public List<GoogleSheet> spreadsheets = new List<GoogleSheet>();
+
             //Settings only store locally
             [NonSerialized]
             public int checkForModifiedInterval = 1000;
@@ -86,6 +92,14 @@ namespace Loca {
             public int checkForUpdateInterval = 120000;
             [NonSerialized]
             public bool autoUpdate = false;
+        }
+
+        [Serializable]
+        public class GoogleSheet {
+            [Tooltip("Just a custom choosen Name")]
+            public string name;
+            public string spreadsheetId;
+            public List<string> sheets;
         }
 
         [Serializable]

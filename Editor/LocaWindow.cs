@@ -14,6 +14,10 @@ namespace Loca {
         private SerializedObject serializedObject;
         private Label statusLabel;
         private TextField filterTxtFld;
+        private Button exportButton;
+        private Button uploadButton;
+        private Button addButton;
+        private Button removeButton;
         private Label filterPlaceholderLbl;
         private Toggle emptyEntryFilterToggle;
         private DropdownField databaseSelection;
@@ -113,11 +117,11 @@ namespace Loca {
             EditorApplication.update += OnUpdate;
 
             //Link Buttons
-            Button exportButton = rootVisualElement.Q("exportButton") as Button;
+            exportButton = rootVisualElement.Q("exportButton") as Button;
             exportButton.clicked -= ExportButton_clicked;
             exportButton.clicked += ExportButton_clicked;
 
-            Button uploadButton = rootVisualElement.Q("uploadButton") as Button;
+            uploadButton = rootVisualElement.Q("uploadButton") as Button;
             uploadButton.clicked -= UploadButton_clicked;
             uploadButton.clicked += UploadButton_clicked;
 
@@ -135,11 +139,11 @@ namespace Loca {
             refreshButton.clicked += RefreshButton_clicked;
             refreshButton.Add(new Image() { image = EditorGUIUtility.IconContent("Refresh@2x").image });
 
-            Button addButton = rootVisualElement.Q("addEntryButton") as Button;
+            addButton = rootVisualElement.Q("addEntryButton") as Button;
             addButton.clicked -= AddEntryButton_clicked;
             addButton.clicked += AddEntryButton_clicked;
 
-            Button removeButton = rootVisualElement.Q("removeEntryButton") as Button;
+            removeButton = rootVisualElement.Q("removeEntryButton") as Button;
             removeButton.clicked -= RemoveEntryButton_clicked;
             removeButton.clicked += RemoveEntryButton_clicked;
 
@@ -169,6 +173,15 @@ namespace Loca {
             SetupFilterLanguage();
 
             CreateMultiColumnListView();
+        }
+
+        private void UpdateReadOnlyGUI() {
+            bool readOnly = curDatabase.isReadOnly;
+
+            exportButton.SetEnabled(!readOnly);
+            uploadButton.SetEnabled(!readOnly);
+            addButton.SetEnabled(!readOnly);
+            removeButton.SetEnabled(!readOnly);
         }
 
         #region MultiColumnListView Logic
@@ -224,7 +237,9 @@ namespace Loca {
                 Label label = new Label();
                 label.enableRichText = LocaSettings.instance.enableLabelRichText;
                 label.style.height = LocaSettings.instance.fixedRowHeight;
-                label.RegisterCallback<ClickEvent>(Clicked);
+                if (!curDatabase.isReadOnly) {
+                    label.RegisterCallback<ClickEvent>(Clicked);
+                }
                 cell.Add(label);
 
                 //TextField
@@ -361,37 +376,39 @@ namespace Loca {
 
             CellUserData cellUserData = (CellUserData)label.userData;
 
-            if (cellUserData.languageIndex == -1) {
-                //Key
-                if (curDatabase.KeyExists(evt.newValue)) {
-                    textField.Q<VisualElement>("unity-text-input").style.color = LocaSettings.instance.hightlightColor;
+            if (label.text != evt.newValue) {
+                if (cellUserData.languageIndex == -1) {
+                    //Key
+                    if (curDatabase.KeyExists(evt.newValue)) {
+                        textField.Q<VisualElement>("unity-text-input").style.color = LocaSettings.instance.hightlightColor;
+                    } else {
+                        textField.Q<VisualElement>("unity-text-input").style.color = StyleKeyword.Null;
+                        tableEntries[cellUserData.rowIndex].key = evt.newValue;
+                        label.text = tableEntries[cellUserData.rowIndex].key;
+                    }
+
+                    label.style.color = LocaSettings.instance.hightlightColor;
+                    label.style.unityFontStyleAndWeight = FontStyle.Italic;
+
+                    tableEntries[cellUserData.rowIndex].hasKeyChanges = true;
+                    tableEntries[cellUserData.rowIndex].EntryUpdated();
+                    curDatabase.ClearEntriesMappingAndStorage();
                 } else {
-                    textField.Q<VisualElement>("unity-text-input").style.color = StyleKeyword.Null;
-                    tableEntries[cellUserData.rowIndex].key = evt.newValue;
-                    label.text = tableEntries[cellUserData.rowIndex].key;
+                    //Content
+                    tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content = evt.newValue;
+
+                    if (label.enableRichText) {
+                        label.text = HighlightTextMarkups(tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content);
+                    } else {
+                        label.text = tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content;
+                    }
+
+                    label.style.color = LocaSettings.instance.hightlightColor;
+                    label.style.unityFontStyleAndWeight = FontStyle.Italic;
+
+                    tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].hasChanges = true;
+                    tableEntries[cellUserData.rowIndex].EntryUpdated();
                 }
-
-                label.style.color = LocaSettings.instance.hightlightColor;
-                label.style.unityFontStyleAndWeight = FontStyle.Italic;
-
-                tableEntries[cellUserData.rowIndex].hasKeyChanges = true;
-                tableEntries[cellUserData.rowIndex].EntryUpdated();
-                curDatabase.ClearEntriesMappingAndStorage();
-            } else {
-                //Content
-                tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content = evt.newValue;
-
-                if (label.enableRichText) {
-                    label.text = HighlightTextMarkups(tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content);
-                } else {
-                    label.text = tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content;
-                }
-
-                label.style.color = LocaSettings.instance.hightlightColor;
-                label.style.unityFontStyleAndWeight = FontStyle.Italic;
-
-                tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].hasChanges = true;
-                tableEntries[cellUserData.rowIndex].EntryUpdated();
             }
         }
 
@@ -415,6 +432,9 @@ namespace Loca {
 
         private void PullButton_clicked() {
             LocaBase.ExtractDatabasesFromSheets();
+
+            LocaBase.ExtractDatabasesFromReadOnlySheets();
+
             SetupDatabaseSelection();
 
             CreateMultiColumnListView();
@@ -500,6 +520,14 @@ namespace Loca {
                 databaseChoices.Add(LocaDatabase.instance.databases[i].sheetName);
             }
 
+            for (int i = 0; i < LocaDatabase.instance.readOnlyDatabases.Count; i++) {
+                if (LocaDatabase.instance.readOnlyDatabases.Count > 1) {
+                    databaseChoices.Add(LocaDatabase.instance.readOnlyDatabases[i].name + " / " + LocaDatabase.instance.readOnlyDatabases[i].sheetName + " [ReadOnly]");
+                } else {
+                    databaseChoices.Add(LocaDatabase.instance.readOnlyDatabases[i].sheetName + " [ReadOnly]");
+                }
+            }
+
             if (databaseChoices.Count == 0) {
                 return;
             }
@@ -520,7 +548,11 @@ namespace Loca {
                 databaseSelection.SetValueWithoutNotify(databaseChoices[index]);
             }
 
-            curDatabase = LocaDatabase.instance.databases[databaseSelection.index];
+            if (databaseSelection.index < LocaDatabase.instance.databases.Count) {
+                curDatabase = LocaDatabase.instance.databases[databaseSelection.index];
+            } else {
+                curDatabase = LocaDatabase.instance.readOnlyDatabases[databaseSelection.index - LocaDatabase.instance.databases.Count];
+            }
         }
 
         /// <summary>
@@ -531,7 +563,11 @@ namespace Loca {
             selectedDatabaseName = evt.newValue;
             selectedDatabaseIndex = databaseSelection.index;
 
-            SelectDatabase(LocaDatabase.instance.databases[databaseSelection.index]);
+            if (databaseSelection.index < LocaDatabase.instance.databases.Count) {
+                SelectDatabase(LocaDatabase.instance.databases[databaseSelection.index]);
+            } else {
+                SelectDatabase(LocaDatabase.instance.readOnlyDatabases[databaseSelection.index - LocaDatabase.instance.databases.Count]);
+            }
         }
 
         /// <summary>
@@ -540,7 +576,7 @@ namespace Loca {
         /// <param name="database">Database to show</param>
         public void SelectDatabase(LocaSubDatabase database) {
             curDatabase = database;
-            databaseSelection.SetValueWithoutNotify(database.sheetName);
+            databaseSelection.SetValueWithoutNotify(databaseSelection.choices[databaseSelection.index]);
 
             if (searchWindow != null) {
                 searchWindow.Close();
@@ -555,6 +591,7 @@ namespace Loca {
             //Redraw ListView
             CreateMultiColumnListView();
             SetupFilterLanguage();
+            UpdateReadOnlyGUI();
         }
         #endregion
 

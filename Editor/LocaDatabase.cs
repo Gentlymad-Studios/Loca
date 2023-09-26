@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 
 namespace Loca {
@@ -12,6 +10,7 @@ namespace Loca {
         public long lastModifiedOnline = 0;
         public long lastModifiedLocal = 0;
         public List<LocaSubDatabase> databases = new List<LocaSubDatabase>();
+        public List<LocaSubDatabase> readOnlyDatabases = new List<LocaSubDatabase>();
 
         /// <summary>
         /// Save the LocaDatabase to Disk
@@ -30,6 +29,7 @@ namespace Loca {
             lastModifiedOnline = 0;
             lastModifiedLocal = 0;
             databases.Clear();
+            readOnlyDatabases.Clear();
         }
 
         /// <summary>
@@ -113,6 +113,13 @@ namespace Loca {
                 }
             }
 
+            for (int i = 0; i < readOnlyDatabases.Count; i++) {
+                LocaEntry entry = readOnlyDatabases[i].GetLocaEntry(key);
+                if (entry != null) {
+                    return entry;
+                }
+            }
+
             return null;
         }
 
@@ -180,7 +187,11 @@ namespace Loca {
             for (int i = 0; i < databases.Count; i++) {
                 filteredEntries.AddRange(databases[i].GetFilteredListOfEntries(term));
             }
-            
+
+            for (int i = 0; i < readOnlyDatabases.Count; i++) {
+                filteredEntries.AddRange(readOnlyDatabases[i].GetFilteredListOfEntries(term));
+            }
+
             return filteredEntries;
         }
 
@@ -195,6 +206,14 @@ namespace Loca {
                 for (int j = 0; j < databases[i].languages.Count; j++) {
                     if (!allLanguages.Contains(databases[i].languages[j])) {
                         allLanguages.Add(databases[i].languages[j]);
+                    }
+                }
+            }
+
+            for (int i = 0; i < readOnlyDatabases.Count; i++) {
+                for (int j = 0; j < readOnlyDatabases[i].languages.Count; j++) {
+                    if (!allLanguages.Contains(readOnlyDatabases[i].languages[j])) {
+                        allLanguages.Add(readOnlyDatabases[i].languages[j]);
                     }
                 }
             }

@@ -75,7 +75,7 @@ namespace Loca {
             }
         }
 
-        public bool Valid(out string error) {
+        public bool Valid(out string error, bool useTimestamp) {
             bool valid = true;
             error = "";
 
@@ -84,7 +84,7 @@ namespace Loca {
                 valid = false;
             }
 
-            if (timestampColumnsIndex == -1) {
+            if (timestampColumnsIndex == -1 && useTimestamp) {
                 error = $"Unable to find {LocaSettings.instance.headerSettings.timestampColumnName}.";
                 valid = false;
             }

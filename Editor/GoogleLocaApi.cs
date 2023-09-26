@@ -90,12 +90,18 @@ namespace Loca {
         /// </summary>
         /// <param name="sheetNameAndRange">Name and Range of the Spreadsheet you want to get. Default will be the mainsheet you set in the Settings.</param>
         /// <returns>Values of the SheetResponse</returns>
-        public static IList<IList<object>> GetSheet(string sheetNameAndRange) {
+        public static IList<IList<object>> GetSheet(bool readOnly, string spreadsheetId, string sheetNameAndRange) {
             if (sheetsHelper == null) {
                 sheetsHelper = new GoogleSheetsHelper();
             }
 
-            SpreadsheetsResource.ValuesResource.GetRequest request = sheetsHelper.Service.Spreadsheets.Values.Get(LocaSettings.instance.googleSettings.spreadsheetId, sheetNameAndRange);
+            SpreadsheetsResource.ValuesResource.GetRequest request = null;
+
+            if (readOnly) {
+                request = sheetsHelper.ServiceApiKey.Spreadsheets.Values.Get(spreadsheetId, sheetNameAndRange);
+            } else {
+                request = sheetsHelper.ServiceOAuth2.Spreadsheets.Values.Get(spreadsheetId, sheetNameAndRange);
+            }
 
             try {
                 ValueRange response = request.Execute();
@@ -117,12 +123,12 @@ namespace Loca {
             }
 
             //Clear Sheet
-            SpreadsheetsResource.ValuesResource.ClearRequest clearRequest = sheetsHelper.Service.Spreadsheets.Values.Clear(new ClearValuesRequest(), LocaSettings.instance.googleSettings.spreadsheetId, sheetName);
+            SpreadsheetsResource.ValuesResource.ClearRequest clearRequest = sheetsHelper.ServiceOAuth2.Spreadsheets.Values.Clear(new ClearValuesRequest(), LocaSettings.instance.googleSettings.spreadsheetId, sheetName);
             clearRequest.Execute();
 
             //Set Values
             ValueRange valueRange = new ValueRange { Values = values };
-            SpreadsheetsResource.ValuesResource.UpdateRequest request = sheetsHelper.Service.Spreadsheets.Values.Update(valueRange, LocaSettings.instance.googleSettings.spreadsheetId, sheetName);
+            SpreadsheetsResource.ValuesResource.UpdateRequest request = sheetsHelper.ServiceOAuth2.Spreadsheets.Values.Update(valueRange, LocaSettings.instance.googleSettings.spreadsheetId, sheetName);
             request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
             request.Execute();
 

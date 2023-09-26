@@ -99,6 +99,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.2] - 2023-09-26
 ### Added
 - Markups now highligthed in if the richtext mode is enabled
-- Show changes in the close dialog 
+- Show changes in the close dialog
 ### Fixed
 - Fixed wrong paste behavior
+
+## [0.2.3] - 2023-09-26
+### Added
+- support for readonly spreadsheets (google api key is required)
+### Fixed
+- Fixed wrong paste behavior (fixed a bug from the fix before)
