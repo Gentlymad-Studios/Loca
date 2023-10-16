@@ -98,6 +98,8 @@ namespace Loca {
                 LocaDatabase.instance.databases[i].ResetChangesFlag();
             }
 
+            LocaDatabase.instance.lastModifiedOnline = GoogleLocaApi.GetSheetModifiedDate();
+
             currentlyUpdating = false;
             LocaDatabase.instance.hasLocalChanges = false;
 
