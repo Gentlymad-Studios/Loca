@@ -1,6 +1,6 @@
 using Google.Apis.Drive.v3.Data;
-using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Sheets.v4;
+using Google.Apis.Sheets.v4.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,13 +12,28 @@ namespace Loca {
         private static GoogleDriveHelper driveHelper;
 
         /// <summary>
-        /// Get the LastModified Date via dedicated WebRequest
+        /// Get the LastModified Date
         /// </summary>
         /// <returns>UTC Time in milliseconds. -1 if something fails</returns>
         public static long GetSheetModifiedDate() {
+            long date = GetSheetModifiedDateViaCustomWebRequest();
+
+            if (date != -1) {
+                return date;
+            }
+
+            UnityEngine.Debug.Log("<color=red>Get LastModified Date via WebRequest failed....fallback to Google Sheet Revision.</color>");
+            return GetSheetModifiedDataViaRevision();
+        }
+
+        /// <summary>
+        /// Get the LastModified Date via dedicated WebRequest
+        /// </summary>
+        /// <returns>UTC Time in milliseconds. -1 if something fails</returns>
+        public static long GetSheetModifiedDateViaCustomWebRequest() {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(LocaSettings.instance.googleSettings.spreadsheetLastModifiedRequest);
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            request.Timeout = 2000;
+            request.Timeout = 4000;
 
             try {
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
@@ -65,10 +80,7 @@ namespace Loca {
                 driveHelper = new GoogleDriveHelper();
             }
 
-            Google.Apis.Drive.v3.RevisionsResource.ListRequest request = driveHelper.Service.Revisions.List(LocaSettings.instance.googleSettings.spreadsheetId);
-            request.PageSize = 1000;
-
-            RevisionList response = request.Execute();
+            RevisionList response = GetNewestRevision(null);
 
             if (response == null) {
                 return -1;
@@ -83,6 +95,25 @@ namespace Loca {
             } else {
                 return -1;
             }
+        }
+
+        /// <summary>
+        /// Return newest revision via pagination
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        private static RevisionList GetNewestRevision(string token) {
+            Google.Apis.Drive.v3.RevisionsResource.ListRequest request = driveHelper.Service.Revisions.List(LocaSettings.instance.googleSettings.spreadsheetId);
+            request.PageToken = token;
+            request.PageSize = 1000;
+
+            RevisionList response = request.Execute();
+
+            if (response.NextPageToken == null) {
+                return response;
+            }
+
+            return GetNewestRevision(response.NextPageToken);
         }
 
         /// <summary>
