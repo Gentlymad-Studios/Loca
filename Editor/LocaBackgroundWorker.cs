@@ -27,6 +27,10 @@ namespace Loca {
                 LocaBase.ExtractLocaKeysFromSheets();
             }
 
+            if (Application.isBatchMode) {
+                return;
+            }
+
             //Start the timer to check for modified frequently
             checkModifiedTimer = new Timer {
                 Interval = LocaSettings.instance.googleSettings.checkForModifiedInterval

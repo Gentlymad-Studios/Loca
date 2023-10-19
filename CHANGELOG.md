@@ -108,3 +108,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - support for readonly spreadsheets (google api key is required)
 ### Fixed
 - Fixed wrong paste behavior (fixed a bug from the fix before)
+
+## [0.2.4] - 2023-10-19
+### Added
+- background worker are now disabled for unity batchmode
