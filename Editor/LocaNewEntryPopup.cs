@@ -21,6 +21,11 @@ namespace Loca {
 
             keyInput = new TextField();
             keyInput.RegisterValueChangedCallback(KeyInput_changed);
+            keyInput.RegisterCallback<KeyDownEvent>(e => {
+                if (e.keyCode == KeyCode.Return) {
+                    CreateButton_clicked();
+                }
+            });
 
             createButton = new Button();
             createButton.text = "Create Entry";
@@ -51,7 +56,7 @@ namespace Loca {
             if (string.IsNullOrEmpty(evt.newValue)) {
                 createButton.SetEnabled(false);
                 return;
-            } 
+            }
 
             if (database.KeyExists(evt.newValue)) {
                 createButton.SetEnabled(false);

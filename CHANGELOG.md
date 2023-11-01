@@ -112,3 +112,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.4] - 2023-10-19
 ### Added
 - background worker are now disabled for unity batchmode
+
+## [0.2.5] - 2023-11-01
+### Added
+- new locaentry can now be confirmed via return button
