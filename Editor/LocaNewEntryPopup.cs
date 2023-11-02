@@ -24,6 +24,8 @@ namespace Loca {
             keyInput.RegisterCallback<KeyDownEvent>(e => {
                 if (e.keyCode == KeyCode.Return) {
                     CreateButton_clicked();
+                } else if (e.keyCode == KeyCode.Escape) {
+                    CancelButton_clicked();
                 }
             });
 
