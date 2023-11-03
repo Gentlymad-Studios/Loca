@@ -144,7 +144,7 @@ namespace Loca {
             if (!KeyExists(key) && !string.IsNullOrEmpty(key)) {
                 //create new one
                 LocaEntry locaEntry = new LocaEntry();
-                locaEntry.key = key.ToLowerInvariant();
+                locaEntry.key = key;
 
                 locaEntry.ReorganizeLocaArray(languages);
                 locaEntry.ReorganizeMiscArray(miscs);
