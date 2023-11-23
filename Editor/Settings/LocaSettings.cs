@@ -1,3 +1,4 @@
+using EditorHelper;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -7,7 +8,8 @@ using UnityEngine.UIElements;
 
 namespace Loca {
     [FilePath("ProjectSettings/" + nameof(LocaSettings) + ".asset", FilePathAttribute.Location.ProjectFolder)]
-    public class LocaSettings : ScriptableSingleton<LocaSettings> {
+    public class LocaSettings : AdvancedSettings<LocaSettings> {
+        public override string Path => "Tools/" + nameof(Loca);
         public const string MENUITEMBASE = "Tools/";
 
         [Space]
@@ -45,14 +47,9 @@ namespace Loca {
         private string searchUxmlIdentifier = "57a565a7e0944f84aa96db85d9a8d7dc";
         public static VisualTreeAsset searchUxml => AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath(instance.searchUxmlIdentifier));
 
-
         [Header("Markups")]
         public List<Markup> markups = new List<Markup>();
         public List<EnclosedMarkup> enclosedMarkups = new List<EnclosedMarkup>();
-
-        public void OnEnable() {
-            hideFlags &= ~HideFlags.NotEditable;
-        }
 
         [Serializable]
         public class JsonDataSettings {
@@ -157,10 +154,6 @@ namespace Loca {
             public string closingTag;
             [Tooltip("The color the markup is highlighted in the Loca Manager. Only visible if the Rich Text for the Labels is enabled.")]
             public Color highlighting;
-        }
-
-        public void Save() {
-            Save(true);
         }
 
         /// <summary>

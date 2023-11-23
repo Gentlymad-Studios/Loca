@@ -116,3 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.5] - 2023-11-01
 ### Added
 - new locaentry can now be confirmed via return button
+
+## [0.2.6] - 2023-11-23
+### Changed
+- switch to newer version of our settingsprovider
