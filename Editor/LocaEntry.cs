@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using UnityEngine.UIElements;
 
 namespace Loca {
     [Serializable]
@@ -12,6 +10,12 @@ namespace Loca {
 
         public bool hasKeyChanges = false;
         public bool hasGlobalChanges = false;
+
+        public int Hash {
+            get {
+                return key.ToLowerInvariant().GetHashCode();
+            }
+        }
 
         [Serializable]
         public class LocaArray {
@@ -92,14 +96,40 @@ namespace Loca {
             miscContent = newContent;
         }
 
-        public bool IsComplete() {
+        public bool IsComplete(string languages) {
             for (int i = 0; i < content.Count; i++) {
-                if (string.IsNullOrEmpty(content[i].content) || string.IsNullOrWhiteSpace(content[i].content)) {
-                    return false;
+                if (languages == "All Languages" || languages == content[i].languageKey) {
+                    if (string.IsNullOrEmpty(content[i].content) || string.IsNullOrWhiteSpace(content[i].content)) {
+                        return false;
+                    }
                 }
             }
 
             return true;
+        }
+
+        public bool ContentContains(string languages, string value) {
+            string lowerValue = value.ToLowerInvariant();
+
+            for (int i = 0; i < content.Count; i++) {
+                if (languages == "All Languages" || languages == content[i].languageKey) {
+                    if (content[i].content.ToLowerInvariant().Contains(lowerValue)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public LocaArray GetContentByLanguageKey(string languageKey) {
+            for (int i = 0; i < content.Count; i++) {
+                if (content[i].languageKey == languageKey) {
+                    return content[i];
+                }
+            }
+
+            return null;
         }
     }
 }

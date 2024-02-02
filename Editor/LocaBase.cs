@@ -8,7 +8,7 @@ using static Loca.HeaderData;
 namespace Loca {
     public static class LocaBase {
         public static bool currentlyUpdating = false;
-        private static HeaderData headerData;
+        //private static HeaderData headerData;
 
         private static void ForEachCellOfRow(Action<object, int> onElement, IList<object> row) {
             for (int j = 0; j < row.Count; j++) {
@@ -16,7 +16,13 @@ namespace Loca {
             }
         }
 
-        private static void ExtractHeaderData(object cellData, int columnIndex) {
+        private static void ForEachCellOfRow(Action<HeaderData, object, int> onElement, IList<object> row, HeaderData headerData) {
+            for (int j = 0; j < row.Count; j++) {
+                onElement(headerData, row[j], j);
+            }
+        }
+
+        private static void ExtractHeaderData(HeaderData headerData, object cellData, int columnIndex) {
             headerData.Extract(((string)cellData), columnIndex);
         }
 
@@ -92,6 +98,8 @@ namespace Loca {
                 LocaDatabase.instance.databases[i].ResetChangesFlag();
             }
 
+            LocaDatabase.instance.lastModifiedOnline = GoogleLocaApi.GetSheetModifiedDate();
+
             currentlyUpdating = false;
             LocaDatabase.instance.hasLocalChanges = false;
 
@@ -106,10 +114,6 @@ namespace Loca {
         public static void ExtractDatabasesFromSheets() {
             Debug.Log("Start extracting Loca from GoogleSheet...");
 
-            if (headerData == null) {
-                headerData = new HeaderData();
-            }
-
             List<LocaSubDatabase> subDatabases = new List<LocaSubDatabase>();
 
             for (int i = 0; i < LocaSettings.instance.googleSettings.sheets.Count; i++) {
@@ -118,7 +122,7 @@ namespace Loca {
                 }
 
                 //Create Database from each GoogleSheet
-                LocaSubDatabase newSubDatabase = ExtractSubDatabaseFromSheet(LocaSettings.instance.googleSettings.sheets[i]);
+                LocaSubDatabase newSubDatabase = ExtractSubDatabaseFromSheet(false, LocaSettings.instance.googleSettings.spreadsheetId, LocaSettings.instance.googleSettings.sheets[i]);
 
                 if (newSubDatabase != null) {
                     subDatabases.Add(newSubDatabase);
@@ -134,8 +138,47 @@ namespace Loca {
             Debug.Log("Loca from GoogleSheet extracted...");
         }
 
-        private static LocaSubDatabase ExtractSubDatabaseFromSheet(string sheetNameAndRange) {
-            IList<IList<object>> values = GoogleLocaApi.GetSheet(sheetNameAndRange);
+        /// <summary>
+        /// Extract Database from each ReadOnly Google Sheet given in our Settings
+        /// </summary>
+        public static void ExtractDatabasesFromReadOnlySheets() {
+            Debug.Log("Start extracting Loca from ReadOnly GoogleSheet...");
+
+            List<LocaSubDatabase> subDatabases = new List<LocaSubDatabase>();
+
+            for (int i = 0; i < LocaSettings.instance.googleSettings.spreadsheets.Count; i++) {
+                GoogleSheet spreadsheet = LocaSettings.instance.googleSettings.spreadsheets[i];
+
+                if (string.IsNullOrEmpty(spreadsheet.spreadsheetId)) {
+                    continue;
+                }
+
+                for (int j = 0; j < spreadsheet.sheets.Count; j++) {
+                    if (string.IsNullOrEmpty(spreadsheet.sheets[j])) {
+                        continue;
+                    }
+
+                    //Create Database from each GoogleSheet
+                    LocaSubDatabase newSubDatabase = ExtractSubDatabaseFromSheet(true, spreadsheet.spreadsheetId, spreadsheet.sheets[j]);
+                    newSubDatabase.name = spreadsheet.name;
+                    newSubDatabase.isReadOnly = true;
+
+                    if (newSubDatabase != null) {
+                        subDatabases.Add(newSubDatabase);
+                    } else {
+                        Debug.Log($"No data in \"{spreadsheet.sheets[j]}\" found.");
+                    }
+                }
+            }
+
+            LocaDatabase database = LocaDatabase.instance;
+            database.readOnlyDatabases = subDatabases;
+
+            Debug.Log("Loca from ReadOnly GoogleSheet extracted...");
+        }
+
+        private static LocaSubDatabase ExtractSubDatabaseFromSheet(bool readOnly, string spreadsheetId, string sheetNameAndRange) {
+            IList<IList<object>> values = GoogleLocaApi.GetSheet(readOnly, spreadsheetId, sheetNameAndRange);
 
             IList<object> row, dataRow;
             object cell;
@@ -146,11 +189,12 @@ namespace Loca {
             if (values != null && values.Count > 0) {
                 dataRow = values[0];
 
+                HeaderData headerData = new HeaderData();
                 headerData.Initialize();
-                ForEachCellOfRow(ExtractHeaderData, dataRow);
-                newSubDatabase.ExtractHeaderData(headerData);
+                ForEachCellOfRow(ExtractHeaderData, dataRow, headerData);
+                newSubDatabase.ExtractHeaderData(headerData, !readOnly);
 
-                if (!headerData.Valid(out string error)) {
+                if (!headerData.Valid(out string error, !readOnly)) {
                     Debug.Log($"{error} Sheet: {sheetNameAndRange}");
                     return null;
                 }
@@ -165,7 +209,7 @@ namespace Loca {
                         locaEntry.key = (string)row[headerData.keyColumnIndex];
 
                         //Timestamp
-                        if (headerData.timestampColumnsIndex < row.Count) {
+                        if (headerData.timestampColumnsIndex < row.Count && headerData.timestampColumnsIndex > 0) {
                             locaEntry.timestamp = long.Parse((string)row[headerData.timestampColumnsIndex]);
                         } else {
                             locaEntry.timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -225,10 +269,6 @@ namespace Loca {
         public static void ExtractLocaKeysFromSheets() {
             Debug.Log("Start extracting LocaKeys from GoogleSheet...");
 
-            if (headerData == null) {
-                headerData = new HeaderData();
-            }
-
             List<LocaSubDatabase> subDatabases = new List<LocaSubDatabase>();
 
             for (int i = 0; i < LocaSettings.instance.googleSettings.sheets.Count; i++) {
@@ -236,7 +276,7 @@ namespace Loca {
                     continue;
                 }
 
-                LocaSubDatabase newSubDatabase = ExtractLocaKeysFromSheet(LocaSettings.instance.googleSettings.sheets[i]);
+                LocaSubDatabase newSubDatabase = ExtractLocaKeysFromSheet(false, LocaSettings.instance.googleSettings.spreadsheetId, LocaSettings.instance.googleSettings.sheets[i]);
 
                 if (newSubDatabase != null) {
                     subDatabases.Add(newSubDatabase);
@@ -249,18 +289,55 @@ namespace Loca {
             database.UpdateDatabase(subDatabases);
         }
 
-        private static LocaSubDatabase ExtractLocaKeysFromSheet(string sheetNameAndRange) {
-            ExtractHeaderDataOnly(sheetNameAndRange);
+        /// <summary>
+        /// Extract Keys from each Google Sheet given in our Settings 
+        /// </summary>
+        public static void ExtractLocaKeysFromReadOnlySheets() {
+            Debug.Log("Start extracting LocaKeys from GoogleSheet...");
+
+            List<LocaSubDatabase> subDatabases = new List<LocaSubDatabase>();
+
+            for (int i = 0; i < LocaSettings.instance.googleSettings.spreadsheets.Count; i++) {
+                GoogleSheet spreadsheet = LocaSettings.instance.googleSettings.spreadsheets[i];
+
+                if (string.IsNullOrEmpty(spreadsheet.spreadsheetId)) {
+                    continue;
+                }
+
+                for (int j = 0; j < spreadsheet.sheets.Count; j++) {
+                    if (string.IsNullOrEmpty(spreadsheet.sheets[j])) {
+                        continue;
+                    }
+
+                    //Create Database from each GoogleSheet
+                    LocaSubDatabase newSubDatabase = ExtractLocaKeysFromSheet(true, spreadsheet.spreadsheetId, spreadsheet.sheets[j]);
+                    newSubDatabase.name = spreadsheet.name;
+                    newSubDatabase.isReadOnly = true;
+
+                    if (newSubDatabase != null) {
+                        subDatabases.Add(newSubDatabase);
+                    } else {
+                        Debug.Log($"No data in \"{spreadsheet.sheets[j]}\" found.");
+                    }
+                }
+            }
+
+            LocaDatabase database = LocaDatabase.instance;
+            database.readOnlyDatabases = subDatabases;
+        }
+
+        private static LocaSubDatabase ExtractLocaKeysFromSheet(bool readOnly, string spreadsheetid, string sheetNameAndRange) {
+            HeaderData headerData = ExtractHeaderDataOnly(readOnly, spreadsheetid, sheetNameAndRange);
             string col = ((char)(headerData.keyColumnIndex + 65)).ToString();
 
-            IList<IList<object>> values = GoogleLocaApi.GetSheet(sheetNameAndRange + $"!{col}:{col}");
+            IList<IList<object>> values = GoogleLocaApi.GetSheet(readOnly, spreadsheetid, sheetNameAndRange + $"!{col}:{col}");
 
             LocaSubDatabase newSubDatabase = new LocaSubDatabase();
             newSubDatabase.sheetName = sheetNameAndRange;
 
-            newSubDatabase.ExtractHeaderData(headerData);
+            newSubDatabase.ExtractHeaderData(headerData, !readOnly);
 
-            if (!headerData.Valid(out string error)) {
+            if (!headerData.Valid(out string error, !readOnly)) {
                 Debug.Log($"{error} Sheet: {sheetNameAndRange}");
                 return null;
             }
@@ -312,12 +389,10 @@ namespace Loca {
         /// <summary>
         /// Request the First Line of the given sheet und generate the headerdata
         /// </summary>
-        private static void ExtractHeaderDataOnly(string sheetNameAndRange) {
-            if (headerData == null) {
-                headerData = new HeaderData();
-            }
+        private static HeaderData ExtractHeaderDataOnly(bool readOnly, string spreadsheetId, string sheetNameAndRange) {
+            HeaderData headerData = new HeaderData();
 
-            IList<IList<object>> values = GoogleLocaApi.GetSheet(sheetNameAndRange + "!1:1");
+            IList<IList<object>> values = GoogleLocaApi.GetSheet(readOnly, spreadsheetId, sheetNameAndRange + "!1:1");
 
             IList<object> dataRow;
 
@@ -325,8 +400,10 @@ namespace Loca {
                 dataRow = values[0];
 
                 headerData.Initialize();
-                ForEachCellOfRow(ExtractHeaderData, dataRow);
+                ForEachCellOfRow(ExtractHeaderData, dataRow, headerData);
             }
+
+            return headerData;
         }
         #endregion
     }

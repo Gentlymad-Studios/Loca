@@ -1,3 +1,4 @@
+using EditorHelper;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -7,7 +8,8 @@ using UnityEngine.UIElements;
 
 namespace Loca {
     [FilePath("ProjectSettings/" + nameof(LocaSettings) + ".asset", FilePathAttribute.Location.ProjectFolder)]
-    public class LocaSettings : ScriptableSingleton<LocaSettings> {
+    public class LocaSettings : AdvancedSettings<LocaSettings> {
+        public override string Path => "Tools/" + nameof(Loca);
         public const string MENUITEMBASE = "Tools/";
 
         [Space]
@@ -45,14 +47,9 @@ namespace Loca {
         private string searchUxmlIdentifier = "57a565a7e0944f84aa96db85d9a8d7dc";
         public static VisualTreeAsset searchUxml => AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(AssetDatabase.GUIDToAssetPath(instance.searchUxmlIdentifier));
 
-
         [Header("Markups")]
         public List<Markup> markups = new List<Markup>();
         public List<EnclosedMarkup> enclosedMarkups = new List<EnclosedMarkup>();
-
-        public void OnEnable() {
-            hideFlags &= ~HideFlags.NotEditable;
-        }
 
         [Serializable]
         public class JsonDataSettings {
@@ -62,11 +59,11 @@ namespace Loca {
 
         [Serializable]
         public class GoogleDataSettings {
+            [Header("Read/Write Spreadsheet")]
             [Tooltip("Secrets for the google access. Google Account need Access to Spreadsheets and the Drive. A restart or recompile may be required.")]
             [TextArea]
             public string secret = "";
 
-            [Header("Spreadsheet")]
             [Tooltip("ID of the Spreadsheet you want to Access")]
             public string spreadsheetId = "";
 
@@ -79,6 +76,12 @@ namespace Loca {
             [Tooltip("Request URL to set the LastModified Date of the given Spreadsheet.")]
             public string spreadsheetSetLastModifiedRequest = "";
 
+            [Header("ReadOnly Spreadsheets")]
+            [Tooltip("API Key to Access the Google Sheets API")]
+            public string apikey = "";
+            [Tooltip("ReadOnly Spreadsheets")]
+            public List<GoogleSheet> spreadsheets = new List<GoogleSheet>();
+
             //Settings only store locally
             [NonSerialized]
             public int checkForModifiedInterval = 1000;
@@ -86,6 +89,14 @@ namespace Loca {
             public int checkForUpdateInterval = 120000;
             [NonSerialized]
             public bool autoUpdate = false;
+        }
+
+        [Serializable]
+        public class GoogleSheet {
+            [Tooltip("Just a custom choosen Name")]
+            public string name;
+            public string spreadsheetId;
+            public List<string> sheets;
         }
 
         [Serializable]
@@ -130,7 +141,10 @@ namespace Loca {
         public class Markup {
             public string name;
             public string tag;
+            [Tooltip("Creates spaces around the Markup when inserted.")]
             public bool surroundingSpace = true;
+            [Tooltip("The color the markup is highlighted in the Loca Manager. Only visible if the Rich Text for the Labels is enabled.")]
+            public Color highlighting;
         }
 
         [Serializable]
@@ -138,10 +152,8 @@ namespace Loca {
             public string name;
             public string openingTag;
             public string closingTag;
-        }
-
-        public void Save() {
-            Save(true);
+            [Tooltip("The color the markup is highlighted in the Loca Manager. Only visible if the Rich Text for the Labels is enabled.")]
+            public Color highlighting;
         }
 
         /// <summary>

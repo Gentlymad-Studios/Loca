@@ -10,6 +10,7 @@ namespace Loca {
         public long lastModifiedOnline = 0;
         public long lastModifiedLocal = 0;
         public List<LocaSubDatabase> databases = new List<LocaSubDatabase>();
+        public List<LocaSubDatabase> readOnlyDatabases = new List<LocaSubDatabase>();
 
         /// <summary>
         /// Save the LocaDatabase to Disk
@@ -28,6 +29,7 @@ namespace Loca {
             lastModifiedOnline = 0;
             lastModifiedLocal = 0;
             databases.Clear();
+            readOnlyDatabases.Clear();
         }
 
         /// <summary>
@@ -96,5 +98,150 @@ namespace Loca {
                 databases.Remove(oldDatabases[i]);
             }
         }
+
+        #region Utils
+        /// <summary>
+        /// Return the First LocaEntry found in all databases
+        /// </summary>
+        /// <param name="key">Key of the Entry</param>
+        /// <returns></returns>
+        public LocaEntry GetLocaEntry(string key) {
+            for (int i = 0; i < databases.Count; i++) {
+                LocaEntry entry = databases[i].GetLocaEntry(key);
+                if (entry != null) {
+                    return entry;
+                }
+            }
+
+            for (int i = 0; i < readOnlyDatabases.Count; i++) {
+                LocaEntry entry = readOnlyDatabases[i].GetLocaEntry(key);
+                if (entry != null) {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Rename LocaEntry with the given name
+        /// </summary>
+        /// <param name="oldName">current name</param>
+        /// <param name="newName">new name</param>
+        /// <returns>true if an entry was renamed</returns>
+        public bool RenameLocaEntry(string oldName, string newName) {
+            bool hasChanges = false;
+
+            for (int i = 0; i < databases.Count; i++) {
+                LocaSubDatabase database = databases[i];
+
+                if (database.KeyExists(newName)) {
+                    //...new key already exists
+                    continue;
+                }
+
+                if (database.KeyExists(oldName)) {
+                    for (int j = 0; j < database.locaEntries.Count; j++) {
+                        LocaEntry entry = database.locaEntries[j];
+
+                        //find the key
+                        if (oldName.ToLowerInvariant() == entry.key.ToLowerInvariant()) {
+                            entry.key = newName;
+                            entry.hasKeyChanges = true;
+                            entry.EntryUpdated();
+
+                            hasChanges = true;
+
+                            database.ClearEntriesMappingAndStorage();
+                        }
+                    }
+                }
+            }
+
+            return hasChanges;
+        }
+
+        /// <summary>
+        /// Create a new LocaEntry with the given key and adds it to the first database or optional to the given one
+        /// </summary>
+        /// <param name="key">Key of the Entry</param>
+        /// <param name="database">Optional: database we want to add the LocaEntry to</param>
+        public void CreateLocaEntry(string key, LocaSubDatabase database = null) {
+            LocaEntry locaEntry = new LocaEntry() { key = key };
+
+            if (database == null) {
+                databases[0].AddLocaEntry(locaEntry);
+            } else {
+                database.AddLocaEntry(locaEntry);
+            }
+        }
+
+        /// <summary>
+        /// Returns a list of entries which keys contains the given term in all databases
+        /// </summary>
+        /// <param name="term"></param>
+        /// <returns></returns>
+        public List<LocaSearchEntry> GetFilteredListOfEntries(string term) {
+            List<LocaSearchEntry> filteredEntries = new List<LocaSearchEntry>();
+
+            for (int i = 0; i < databases.Count; i++) {
+                filteredEntries.AddRange(databases[i].GetFilteredListOfEntries(term));
+            }
+
+            for (int i = 0; i < readOnlyDatabases.Count; i++) {
+                filteredEntries.AddRange(readOnlyDatabases[i].GetFilteredListOfEntries(term));
+            }
+
+            return filteredEntries;
+        }
+
+        /// <summary>
+        /// Returns a list of all languages in all databases
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetAllUsedLanguages() {
+            List<string> allLanguages = new List<string>();
+
+            for (int i = 0; i < databases.Count; i++) {
+                for (int j = 0; j < databases[i].languages.Count; j++) {
+                    if (!allLanguages.Contains(databases[i].languages[j])) {
+                        allLanguages.Add(databases[i].languages[j]);
+                    }
+                }
+            }
+
+            for (int i = 0; i < readOnlyDatabases.Count; i++) {
+                for (int j = 0; j < readOnlyDatabases[i].languages.Count; j++) {
+                    if (!allLanguages.Contains(readOnlyDatabases[i].languages[j])) {
+                        allLanguages.Add(readOnlyDatabases[i].languages[j]);
+                    }
+                }
+            }
+
+            return allLanguages;
+        }
+
+        /// <summary>
+        /// Returns a list with all keys that got changes 
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetChanges() {
+            List<string> changes = new List<string>();
+
+            for (int i = 0; i < databases.Count; i++) {
+                for (int j = 0; j < databases[i].locaEntries.Count; j++) {
+                    if (databases[i].locaEntries[j].hasGlobalChanges) {
+                        if (databases.Count > 1) {
+                            changes.Add($"[{databases[i].sheetName}] {databases[i].locaEntries[j].key}");
+                        } else {
+                            changes.Add(databases[i].locaEntries[j].key);
+                        }
+                    }
+                }
+            }
+
+            return changes;
+        }
+        #endregion
     }
 }

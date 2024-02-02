@@ -6,6 +6,8 @@ using UnityEngine;
 namespace Loca {
     [Serializable]
     public class LocaSubDatabase {
+        public bool isReadOnly;
+        public string name = "Main";
         public string sheetName;
 
         public List<string> languages = new List<string>();
@@ -31,7 +33,7 @@ namespace Loca {
             }
         }
 
-        public bool ExtractHeaderData(HeaderData headerData) {
+        public bool ExtractHeaderData(HeaderData headerData, bool useTimestamp) {
             bool success = true;
 
             keyColumnIndex = headerData.keyColumnIndex;
@@ -52,7 +54,7 @@ namespace Loca {
                 success = false;
             }
 
-            if (timestampColumnIndex == -1) {
+            if (timestampColumnIndex == -1 && useTimestamp) {
                 Debug.LogWarning($"Unable to find {LocaSettings.instance.headerSettings.timestampColumnName} column in sheet {sheetName}");
                 success = false;
             }
@@ -61,7 +63,7 @@ namespace Loca {
         }
 
         /// <summary>
-        /// Upade this SubDatabase from the given new one
+        /// Update this SubDatabase from the given new one
         /// </summary>
         /// <param name="newSubDatabase">new SubDatabase</param>
         public void Update(LocaSubDatabase newSubDatabase) {
@@ -130,6 +132,7 @@ namespace Loca {
 
                 locaEntries.Add(locaEntry);
                 locaEntriesMapping.Add(locaEntry.key.ToLowerInvariant(), locaEntries.Count - 1);
+                LocaKeyHashStorage.Clear();
             }
         }
 
@@ -138,10 +141,10 @@ namespace Loca {
         /// </summary>
         /// <param name="key"></param>
         public bool CreateLocaEntry(string key) {
-            if (!KeyExists(key)) {
+            if (!KeyExists(key) && !string.IsNullOrEmpty(key)) {
                 //create new one
                 LocaEntry locaEntry = new LocaEntry();
-                locaEntry.key = key.ToLowerInvariant();
+                locaEntry.key = key;
 
                 locaEntry.ReorganizeLocaArray(languages);
                 locaEntry.ReorganizeMiscArray(miscs);
@@ -162,7 +165,7 @@ namespace Loca {
         /// <param name="locaEntry"></param>
         public void RemoveLocaEntry(LocaEntry locaEntry) {
             locaEntries.Remove(locaEntry);
-            ClearEntriesMapping();
+            ClearEntriesMappingAndStorage();
         }
 
         /// <summary>
@@ -184,8 +187,9 @@ namespace Loca {
 
             foreach (KeyValuePair<string, int> remove in mappingToRemove.Reverse()) {
                 locaEntries.RemoveAt(remove.Value);
-                ClearEntriesMapping();
             }
+
+            ClearEntriesMappingAndStorage();
         }
 
         #region Utils
@@ -218,8 +222,8 @@ namespace Loca {
         /// <returns></returns>
         public LocaSearchEntry GetLocaSearchEntryByHash(int hash) {
             for (int i = 0; i < locaEntries.Count; i++) {
-                if (locaEntries[i].key.ToLowerInvariant().GetHashCode() == hash) {
-                    return new LocaSearchEntry(locaEntries[i], i);
+                if (locaEntries[i].Hash == hash) {
+                    return new LocaSearchEntry(this, locaEntries[i], i);
                 }
             }
             return null;
@@ -242,8 +246,9 @@ namespace Loca {
         /// <summary>
         /// Clear LocaEntriesMapping
         /// </summary>
-        public void ClearEntriesMapping() {
+        public void ClearEntriesMappingAndStorage() {
             locaEntriesMapping.Clear();
+            LocaKeyHashStorage.Clear();
         }
 
         /// <summary>
@@ -280,7 +285,7 @@ namespace Loca {
 
             foreach (KeyValuePair<string, int> mapping in _locaEntriesMapping) {
                 if (mapping.Key.ToLowerInvariant().Contains(term)) {
-                    filteredEntries.Add(new LocaSearchEntry(locaEntries[mapping.Value], mapping.Value));
+                    filteredEntries.Add(new LocaSearchEntry(this, locaEntries[mapping.Value], mapping.Value));
                 }
             }
 
@@ -292,25 +297,21 @@ namespace Loca {
         /// </summary>
         /// <param name="term"></param>
         /// <param name="filteredEntries"></param>
-        public void FillFilteredListOfEntries(string term, bool emptyOnly, ref List<LocaEntry> filteredEntries) {
+        public void FillFilteredListOfEntries(string term, bool emptyOnly, string language, ref List<LocaEntry> filteredEntries) {
             filteredEntries.Clear();
 
             term = term.ToLowerInvariant();
 
-            if (emptyOnly) {
-                for (int i = 0; i < locaEntries.Count; i++) {
-                    LocaEntry entry = locaEntries[i];
+            for (int i = 0; i < locaEntries.Count; i++) {
+                LocaEntry entry = locaEntries[i];
 
-                    if (entry.key.ToLowerInvariant().Contains(term)) {
-                        if (!entry.IsComplete()) {
-                            filteredEntries.Add(locaEntries[i]);
-                        }
+                if (entry.key.ToLowerInvariant().Contains(term)) {
+                    if (!emptyOnly || !entry.IsComplete(language)) {
+                        filteredEntries.Add(locaEntries[i]);
                     }
-                }
-            } else {
-                foreach (KeyValuePair<string, int> mapping in _locaEntriesMapping) {
-                    if (mapping.Key.ToLowerInvariant().Contains(term)) {
-                        filteredEntries.Add(locaEntries[mapping.Value]);
+                } else if (entry.ContentContains(language, term)) {
+                    if (!emptyOnly || !entry.IsComplete(language)) {
+                        filteredEntries.Add(locaEntries[i]);
                     }
                 }
             }
@@ -327,13 +328,17 @@ namespace Loca {
             jsonObject.translations = new Dictionary<int, string>();
 
             for (int i = 0; i < locaEntries.Count; i++) {
-
-                if (jsonObject.translations.ContainsKey(locaEntries[i].key.ToLowerInvariant().GetHashCode())) {
-                    Debug.Log(jsonObject.translations[locaEntries[i].key.ToLowerInvariant().GetHashCode()]);
-                    Debug.Log(locaEntries[i].key.ToLowerInvariant().GetHashCode() + " - " + locaEntries[i].key);
+                if (string.IsNullOrEmpty(locaEntries[i].key)) {
+                    Debug.LogError(locaEntries[i].Hash + " has an no Key and was skipped!");
+                    continue;
                 }
 
-                jsonObject.translations.Add(locaEntries[i].key.ToLowerInvariant().GetHashCode(), locaEntries[i].key);
+                if (jsonObject.translations.ContainsKey(locaEntries[i].Hash)) {
+                    Debug.Log(jsonObject.translations[locaEntries[i].Hash]);
+                    Debug.Log(locaEntries[i].Hash + " - " + locaEntries[i].key);
+                }
+
+                jsonObject.translations.Add(locaEntries[i].Hash, locaEntries[i].key);
             }
 
             return jsonObject;
@@ -349,7 +354,12 @@ namespace Loca {
             jsonObject.translations = new Dictionary<int, string>();
 
             for (int i = 0; i < locaEntries.Count; i++) {
-                jsonObject.translations.Add(locaEntries[i].key.ToLowerInvariant().GetHashCode(), locaEntries[i].content[langIndex].content);
+                if (string.IsNullOrEmpty(locaEntries[i].key)) {
+                    Debug.LogError(locaEntries[i].Hash + " has an no Key and was skipped!");
+                    continue;
+                }
+
+                jsonObject.translations.Add(locaEntries[i].Hash, locaEntries[i].content[langIndex].content);
             }
 
             return jsonObject;
@@ -420,4 +430,5 @@ namespace Loca {
         }
         #endregion
     }
+
 }

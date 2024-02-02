@@ -4,21 +4,40 @@ using Google.Apis.Sheets.v4;
 
 namespace Loca {
     public class GoogleSheetsHelper {
-        public SheetsService Service { get; set; }
+        public enum AuthenticationMethod {
+            ApiKey,
+            OAuth2
+        }
+
+        public SheetsService ServiceOAuth2 {
+            get; set;
+        }
+        public SheetsService ServiceApiKey {
+            get; set;
+        }
         const string APPLICATION_NAME = nameof(Loca);
         static readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
 
         public GoogleSheetsHelper() {
-            InitializeService();
+            InitializeServices();
         }
 
-        private void InitializeService() {
-            GoogleCredential credential = GoogleCredential.FromJson(LocaSettings.instance.googleSettings.secret).CreateScoped(Scopes);
+        private void InitializeServices() {
+            if (!string.IsNullOrEmpty(LocaSettings.instance.googleSettings.secret)) {
+                GoogleCredential credential = GoogleCredential.FromJson(LocaSettings.instance.googleSettings.secret).CreateScoped(Scopes);
 
-            Service = new SheetsService(new BaseClientService.Initializer() {
-                HttpClientInitializer = credential,
-                ApplicationName = APPLICATION_NAME
-            });
+                ServiceOAuth2 = new SheetsService(new BaseClientService.Initializer() {
+                    HttpClientInitializer = credential,
+                    ApplicationName = APPLICATION_NAME
+                });
+            }
+
+            if (!string.IsNullOrEmpty(LocaSettings.instance.googleSettings.apikey)) {
+                ServiceApiKey = new SheetsService(new BaseClientService.Initializer() {
+                    ApplicationName = APPLICATION_NAME,
+                    ApiKey = LocaSettings.instance.googleSettings.apikey
+                });
+            }
         }
     }
 }

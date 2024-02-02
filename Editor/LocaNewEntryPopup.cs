@@ -8,6 +8,7 @@ namespace Loca {
         Button createButton;
         string output = string.Empty;
         LocaSubDatabase database;
+        static Vector2 windowSize = new Vector2(250, 70);
 
         void CreateGUI() {
             rootVisualElement.style.marginBottom = 2;
@@ -20,6 +21,13 @@ namespace Loca {
 
             keyInput = new TextField();
             keyInput.RegisterValueChangedCallback(KeyInput_changed);
+            keyInput.RegisterCallback<KeyDownEvent>(e => {
+                if (e.keyCode == KeyCode.Return) {
+                    CreateButton_clicked();
+                } else if (e.keyCode == KeyCode.Escape && string.IsNullOrEmpty(keyInput.text)) {
+                    CancelButton_clicked();
+                }
+            });
 
             createButton = new Button();
             createButton.text = "Create Entry";
@@ -42,13 +50,15 @@ namespace Loca {
             rootVisualElement.Add(description);
             rootVisualElement.Add(keyInput);
             rootVisualElement.Add(buttonContainer);
+
+            keyInput.Focus();
         }
 
         private void KeyInput_changed(ChangeEvent<string> evt) {
             if (string.IsNullOrEmpty(evt.newValue)) {
                 createButton.SetEnabled(false);
                 return;
-            } 
+            }
 
             if (database.KeyExists(evt.newValue)) {
                 createButton.SetEnabled(false);
@@ -71,10 +81,11 @@ namespace Loca {
         public static string Initialize(LocaSubDatabase database) {
             LocaNewEntryPopup window = CreateInstance<LocaNewEntryPopup>();
             window.database = database;
-            window.maxSize = new Vector2 (250, 70);
-            window.minSize = new Vector2(250, 70);
+            window.maxSize = windowSize;
+            window.minSize = windowSize;
             window.titleContent = new GUIContent("New LocaKey");
-            window.ShowModal();
+            window.position = new Rect(new Vector2(Screen.width / 2, Screen.height / 2), windowSize);
+            window.ShowModalUtility();
 
             return window.output;
         }

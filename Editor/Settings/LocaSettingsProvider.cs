@@ -5,49 +5,29 @@ using UnityEngine.UIElements;
 using EditorHelper;
 
 namespace Loca {
-    public class LocaSettingsProvider : ScriptableSingletonProviderBase {
-        private static readonly string[] tags = new string[] { nameof(Loca) };
-
+    public class LocaSettingsProvider : AdvancedSingletonProviderBase<LocaSettings> {
         [SettingsProvider]
-        public static SettingsProvider CreateMyCustomSettingsProvider() {
-            return LocaSettings.instance ? new LocaSettingsProvider() : null;
+        private static SettingsProvider CreateProvider() {
+            return CreateSettingsProvider<LocaSettingsProvider>();
         }
 
-        public LocaSettingsProvider(SettingsScope scope = SettingsScope.Project) : base(LocaSettings.MENUITEMBASE + nameof(Loca), scope) {
-            keywords = tags;
-        }
+        public LocaSettingsProvider(string path) : base(path) { }
 
-        protected override EventCallback<SerializedPropertyChangeEvent> GetValueChangedCallback() {
-            return ValueChanged;
+        protected override string[] GetTags() {
+            return new string[] { nameof(Loca) };
         }
 
         /// <summary>
         /// Called when any value changed.
         /// </summary>
         /// <param name="evt"></param>
-        private void ValueChanged(SerializedPropertyChangeEvent evt) {
-            // notify all listeneres (ReactiveSettings)
-            serializedObject.ApplyModifiedProperties();
-            // call save on our singleton as it is a strange hybrid and not a full ScriptableObject
-            LocaSettings.instance.Save();
+        protected override void ValueChanged(SerializedPropertyChangeEvent evt) {
+            base.ValueChanged(evt);
 
             //Reset BackgroundWorker fail
             LocaBackgroundWorker.apiFailed = false;
         }
 
-        protected override string GetHeader() {
-            return nameof(Loca);
-        }
-
-        public override Type GetDataType() {
-            return typeof(LocaSettings);
-        }
-
-        public override dynamic GetInstance() {
-            //Force HideFlags
-            LocaSettings.instance.OnEnable();
-            return LocaSettings.instance;
-        }
 
         public override void OnActivate(string searchContext, VisualElement rootElement) {
             base.OnActivate(searchContext, rootElement);

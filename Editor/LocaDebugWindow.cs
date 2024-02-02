@@ -34,6 +34,10 @@ namespace Loca {
                 Debug.Log(GoogleLocaApi.GetSheetModifiedDataViaRevision());
             }
 
+            if (GUILayout.Button("Get Modified Date via Meta")) {
+                Debug.Log(GoogleLocaApi.GetSheetModifiedDateViaMeta());
+            }
+
             if (GUILayout.Button("Clear Database")) {
                 LocaBase.ClearDatabase();
                 LocaDatabase.instance.Save();

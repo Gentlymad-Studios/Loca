@@ -1,6 +1,6 @@
 using Google.Apis.Drive.v3.Data;
-using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Sheets.v4;
+using Google.Apis.Sheets.v4.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,13 +12,28 @@ namespace Loca {
         private static GoogleDriveHelper driveHelper;
 
         /// <summary>
-        /// Get the LastModified Date via dedicated WebRequest
+        /// Get the LastModified Date
         /// </summary>
         /// <returns>UTC Time in milliseconds. -1 if something fails</returns>
         public static long GetSheetModifiedDate() {
+            long date = GetSheetModifiedDateViaCustomWebRequest();
+
+            if (date != -1) {
+                return date;
+            }
+
+            UnityEngine.Debug.Log("<color=red>Get LastModified Date via WebRequest failed....fallback to Google Sheet Revision.</color>");
+            return GetSheetModifiedDataViaRevision();
+        }
+
+        /// <summary>
+        /// Get the LastModified Date via dedicated WebRequest
+        /// </summary>
+        /// <returns>UTC Time in milliseconds. -1 if something fails</returns>
+        public static long GetSheetModifiedDateViaCustomWebRequest() {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(LocaSettings.instance.googleSettings.spreadsheetLastModifiedRequest);
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            request.Timeout = 2000;
+            request.Timeout = 4000;
 
             try {
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
@@ -65,10 +80,7 @@ namespace Loca {
                 driveHelper = new GoogleDriveHelper();
             }
 
-            Google.Apis.Drive.v3.RevisionsResource.ListRequest request = driveHelper.Service.Revisions.List(LocaSettings.instance.googleSettings.spreadsheetId);
-            request.PageSize = 1000;
-
-            RevisionList response = request.Execute();
+            RevisionList response = GetNewestRevision(null);
 
             if (response == null) {
                 return -1;
@@ -86,16 +98,41 @@ namespace Loca {
         }
 
         /// <summary>
+        /// Return newest revision via pagination
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        private static RevisionList GetNewestRevision(string token) {
+            Google.Apis.Drive.v3.RevisionsResource.ListRequest request = driveHelper.Service.Revisions.List(LocaSettings.instance.googleSettings.spreadsheetId);
+            request.PageToken = token;
+            request.PageSize = 1000;
+
+            RevisionList response = request.Execute();
+
+            if (response.NextPageToken == null) {
+                return response;
+            }
+
+            return GetNewestRevision(response.NextPageToken);
+        }
+
+        /// <summary>
         /// Get the Values of the given Spreadsheet, max 300 calls in 60 seconds
         /// </summary>
         /// <param name="sheetNameAndRange">Name and Range of the Spreadsheet you want to get. Default will be the mainsheet you set in the Settings.</param>
         /// <returns>Values of the SheetResponse</returns>
-        public static IList<IList<object>> GetSheet(string sheetNameAndRange) {
+        public static IList<IList<object>> GetSheet(bool readOnly, string spreadsheetId, string sheetNameAndRange) {
             if (sheetsHelper == null) {
                 sheetsHelper = new GoogleSheetsHelper();
             }
 
-            SpreadsheetsResource.ValuesResource.GetRequest request = sheetsHelper.Service.Spreadsheets.Values.Get(LocaSettings.instance.googleSettings.spreadsheetId, sheetNameAndRange);
+            SpreadsheetsResource.ValuesResource.GetRequest request = null;
+
+            if (readOnly) {
+                request = sheetsHelper.ServiceApiKey.Spreadsheets.Values.Get(spreadsheetId, sheetNameAndRange);
+            } else {
+                request = sheetsHelper.ServiceOAuth2.Spreadsheets.Values.Get(spreadsheetId, sheetNameAndRange);
+            }
 
             try {
                 ValueRange response = request.Execute();
@@ -117,12 +154,12 @@ namespace Loca {
             }
 
             //Clear Sheet
-            SpreadsheetsResource.ValuesResource.ClearRequest clearRequest = sheetsHelper.Service.Spreadsheets.Values.Clear(new ClearValuesRequest(), LocaSettings.instance.googleSettings.spreadsheetId, sheetName);
+            SpreadsheetsResource.ValuesResource.ClearRequest clearRequest = sheetsHelper.ServiceOAuth2.Spreadsheets.Values.Clear(new ClearValuesRequest(), LocaSettings.instance.googleSettings.spreadsheetId, sheetName);
             clearRequest.Execute();
 
             //Set Values
             ValueRange valueRange = new ValueRange { Values = values };
-            SpreadsheetsResource.ValuesResource.UpdateRequest request = sheetsHelper.Service.Spreadsheets.Values.Update(valueRange, LocaSettings.instance.googleSettings.spreadsheetId, sheetName);
+            SpreadsheetsResource.ValuesResource.UpdateRequest request = sheetsHelper.ServiceOAuth2.Spreadsheets.Values.Update(valueRange, LocaSettings.instance.googleSettings.spreadsheetId, sheetName);
             request.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
             request.Execute();
 

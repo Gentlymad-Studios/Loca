@@ -68,10 +68,12 @@ namespace Loca {
     }
 
     public class LocaSearchEntry {
+        public LocaSubDatabase database;
         public LocaEntry entry;
         public int index;
 
-        public LocaSearchEntry(LocaEntry entry, int index) {
+        public LocaSearchEntry(LocaSubDatabase database, LocaEntry entry, int index) {
+            this.database = database;
             this.entry = entry;
             this.index = index;
         }

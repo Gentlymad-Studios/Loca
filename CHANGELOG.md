@@ -63,3 +63,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.4] - 2023-06-02
 ### Added
 - extend locasearch to search by hash
+
+## [0.1.5] - 2023-06-05
+### Added
+- add "hash <-> key" storage
+
+## [0.1.6] - 2023-06-06
+### Added
+- add language option to the filter for uncomplete entries
+### Changed
+- labels are now full sized for a proper click event
+
+## [0.1.7] - 2023-06-07
+### Added
+- add method to open the locamanager at a given position / key
+- add method to create a new locaentry by key
+- add method to rename a locaentry
+
+## [0.1.8] - 2023-08-28
+### Fixed
+- filter empty keys on export
+
+## [0.1.9] - 2023-09-04
+### Added
+- filteroption now filters content too
+
+## [0.2.0] - 2023-09-11
+### Fixed
+- fixed Add Entry cancel behavior
+
+## [0.2.1] - 2023-09-20
+### Changed
+- Add LocaEntry Window now opens in the center with focus on the input field
+
+## [0.2.2] - 2023-09-26
+### Added
+- Markups now highligthed in if the richtext mode is enabled
+- Show changes in the close dialog
+### Fixed
+- Fixed wrong paste behavior
+
+## [0.2.3] - 2023-09-26
+### Added
+- support for readonly spreadsheets (google api key is required)
+### Fixed
+- Fixed wrong paste behavior (fixed a bug from the fix before)
+
+## [0.2.4] - 2023-10-19
+### Added
+- background worker are now disabled for unity batchmode
+
+## [0.2.5] - 2023-11-01
+### Added
+- new locaentry can now be confirmed via return button
+
+## [0.2.6] - 2023-11-23
+### Changed
+- switch to newer version of our settingsprovider
