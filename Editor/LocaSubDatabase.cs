@@ -68,8 +68,8 @@ namespace Loca {
             //check for old entries
             CleanupOldEntries(newSubDatabase._locaEntriesMapping);
 
-            keyColumnIndex = newSubDatabase.keyColumnIndex;
-            timestampColumnIndex = newSubDatabase.timestampColumnIndex;
+            //keyColumnIndex = newSubDatabase.keyColumnIndex;
+            //timestampColumnIndex = newSubDatabase.timestampColumnIndex;
 
             //check for language updated
             bool languageColumnUpdated = !languages.SequenceEqual(newSubDatabase.languages);
