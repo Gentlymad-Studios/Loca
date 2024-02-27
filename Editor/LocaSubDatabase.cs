@@ -50,12 +50,12 @@ namespace Loca {
             }
 
             if (keyColumnIndex == -1) {
-                Debug.LogWarning($"Unable to find {LocaSettings.instance.headerSettings.keyColumnName} column in sheet {sheetName}");
+                Debug.LogWarning($"[Loca] Unable to find {LocaSettings.instance.headerSettings.keyColumnName} column in sheet {sheetName}");
                 success = false;
             }
 
             if (timestampColumnIndex == -1 && useTimestamp) {
-                Debug.LogWarning($"Unable to find {LocaSettings.instance.headerSettings.timestampColumnName} column in sheet {sheetName}");
+                Debug.LogWarning($"[Loca] Unable to find {LocaSettings.instance.headerSettings.timestampColumnName} column in sheet {sheetName}");
                 success = false;
             }
 
@@ -329,13 +329,13 @@ namespace Loca {
 
             for (int i = 0; i < locaEntries.Count; i++) {
                 if (string.IsNullOrEmpty(locaEntries[i].key)) {
-                    Debug.LogError(locaEntries[i].Hash + " has an no Key and was skipped!");
+                    Debug.LogError("[Loca] " + locaEntries[i].Hash + " has an no Key and was skipped!");
                     continue;
                 }
 
                 if (jsonObject.translations.ContainsKey(locaEntries[i].Hash)) {
-                    Debug.Log(jsonObject.translations[locaEntries[i].Hash]);
-                    Debug.Log(locaEntries[i].Hash + " - " + locaEntries[i].key);
+                    Debug.Log("[Loca] " + jsonObject.translations[locaEntries[i].Hash]);
+                    Debug.Log("[Loca] " + locaEntries[i].Hash + " - " + locaEntries[i].key);
                 }
 
                 jsonObject.translations.Add(locaEntries[i].Hash, locaEntries[i].key);
@@ -355,7 +355,7 @@ namespace Loca {
 
             for (int i = 0; i < locaEntries.Count; i++) {
                 if (string.IsNullOrEmpty(locaEntries[i].key)) {
-                    Debug.LogError(locaEntries[i].Hash + " has an no Key and was skipped!");
+                    Debug.LogError("[Loca] " + locaEntries[i].Hash + " has an no Key and was skipped!");
                     continue;
                 }
 

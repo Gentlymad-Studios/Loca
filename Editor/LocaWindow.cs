@@ -67,7 +67,9 @@ namespace Loca {
             //Save Local Version
             LocaDatabase.instance.Save();
 
-            if (LocaDatabase.instance.hasLocalChanges) {
+            LocaBase.LocalDatabaseIsUpToDate(out bool failToGetModifiedDate);
+
+            if (LocaDatabase.instance.hasLocalChanges && !failToGetModifiedDate) {
                 int changesLimit = 50;
 
                 List<string> changes = LocaDatabase.instance.GetChanges();

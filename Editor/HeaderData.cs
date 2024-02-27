@@ -52,7 +52,7 @@ namespace Loca {
                     if (detectedCultureInfo == null) {
                         for (int i = 0; i < cultures.Length; i++) {
                             if (cultureNamesLowercase[i] == cellData.ToLower()) {
-                                Debug.Log(cultureNamesLowercase[i] + " " + cellData.ToLower() + " " + cultures[i].DisplayName);
+                                Debug.Log("[Loca] " + cultureNamesLowercase[i] + " " + cellData.ToLower() + " " + cultures[i].DisplayName);
                                 detectedCultureInfo = cultures[i];
                                 break;
                             }
@@ -63,7 +63,7 @@ namespace Loca {
                         detectedLanguages.Add(new LanguageColumn(columnIndex,detectedCultureInfo));
                     } else {
                         if (detectedCultureInfo != null) {
-                            Debug.Log($"Detected duplicate language items in data header! Language: {detectedCultureInfo.EnglishName}");
+                            Debug.Log($"[Loca] Detected duplicate language items in data header! Language: {detectedCultureInfo.EnglishName}");
                         } else {
                             //Debug.Log($"Unable to retrieve language for column: {cellData}");
 

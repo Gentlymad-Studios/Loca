@@ -10,7 +10,7 @@ namespace Loca {
             bool upToDate = LocaBase.LocalDatabaseIsUpToDate(out bool failToGetModifiedDate);
 
             if (failToGetModifiedDate) {
-                Debug.LogError("Unable to reach LocaSheet modified Date");
+                Debug.LogError("[Loca] Unable to reach LocaSheet modified Date");
             }
 
             if (!upToDate && !failToGetModifiedDate) {
@@ -18,7 +18,7 @@ namespace Loca {
             }
 
             if (LocaDatabase.instance.databases.Count == 0) {
-                Debug.LogError("Loca Database is Empty!");
+                Debug.LogError("[Loca] Loca Database is Empty!");
                 return;
             }
 

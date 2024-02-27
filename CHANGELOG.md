@@ -120,3 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.6] - 2023-11-23
 ### Changed
 - switch to newer version of our settingsprovider
+
+## [0.2.7] - 2024-02-27
+### Changed
+- correctly fallback to revision check and catch exception if we got connection issues

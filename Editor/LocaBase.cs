@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using static Loca.LocaSettings;
 using static Loca.HeaderData;
+using UnityEngine.PlayerLoop;
 
 namespace Loca {
     public static class LocaBase {
@@ -65,13 +66,13 @@ namespace Loca {
             upToDate = LocalDatabaseIsUpToDate(out bool failToGetModifiedDate);
 
             if (failToGetModifiedDate) {
-                Debug.Log("Loca Sheet save was aborted...unable to reach the modifiedDate.");
+                Debug.Log("[Loca] Loca Sheet save was aborted...unable to reach the modifiedDate.");
                 currentlyUpdating = false;
                 return false;
             }
 
             if (!upToDate) {
-                Debug.Log("Loca Database got changes, update will be performend...");
+                Debug.Log("[Loca] Loca Database got changes, update will be performend...");
                 ExtractDatabasesFromSheets();
             }
 
@@ -80,13 +81,13 @@ namespace Loca {
             upToDate = LocalDatabaseIsUpToDate(out failToGetModifiedDate);
 
             if (failToGetModifiedDate) {
-                Debug.Log("Loca Sheet save was aborted...unable to reach the modifiedDate.");
+                Debug.Log("[Loca] Loca Sheet save was aborted...unable to reach the modifiedDate.");
                 currentlyUpdating = false;
                 return false;
             }
 
             if (!upToDate) {
-                Debug.Log("Loca Sheet got an last minute update, please retry manually...");
+                Debug.Log("[Loca] Loca Sheet got an last minute update, please retry manually...");
                 currentlyUpdating = false;
                 return false;
             }
@@ -112,7 +113,14 @@ namespace Loca {
         /// Extract Database from each Google Sheet given in our Settings
         /// </summary>
         public static void ExtractDatabasesFromSheets() {
-            Debug.Log("Start extracting Loca from GoogleSheet...");
+            LocalDatabaseIsUpToDate(out bool failToGetModifiedDate);
+
+            if (failToGetModifiedDate) {
+                Debug.Log("[Loca] Unable to retrieve Loca");
+                return;
+            }
+
+            Debug.Log("[Loca] Start extracting Loca from GoogleSheet...");
 
             List<LocaSubDatabase> subDatabases = new List<LocaSubDatabase>();
 
@@ -127,7 +135,7 @@ namespace Loca {
                 if (newSubDatabase != null) {
                     subDatabases.Add(newSubDatabase);
                 } else {
-                    Debug.Log($"No data in \"{LocaSettings.instance.googleSettings.sheets[i]}\" found.");
+                    Debug.Log($"[Loca] No data in \"{LocaSettings.instance.googleSettings.sheets[i]}\" found.");
                 }
             }
 
@@ -135,14 +143,21 @@ namespace Loca {
             database.UpdateDatabase(subDatabases);
             database.lastModifiedOnline = GoogleLocaApi.GetSheetModifiedDate();
 
-            Debug.Log("Loca from GoogleSheet extracted...");
+            Debug.Log("[Loca] Loca from GoogleSheet extracted...");
         }
 
         /// <summary>
         /// Extract Database from each ReadOnly Google Sheet given in our Settings
         /// </summary>
         public static void ExtractDatabasesFromReadOnlySheets() {
-            Debug.Log("Start extracting Loca from ReadOnly GoogleSheet...");
+            LocalDatabaseIsUpToDate(out bool failToGetModifiedDate);
+
+            if (failToGetModifiedDate) {
+                Debug.Log("[Loca] Unable to retrieve Loca");
+                return;
+            }
+
+            Debug.Log("[Loca] Start extracting Loca from ReadOnly GoogleSheet...");
 
             List<LocaSubDatabase> subDatabases = new List<LocaSubDatabase>();
 
@@ -166,7 +181,7 @@ namespace Loca {
                     if (newSubDatabase != null) {
                         subDatabases.Add(newSubDatabase);
                     } else {
-                        Debug.Log($"No data in \"{spreadsheet.sheets[j]}\" found.");
+                        Debug.Log($"[Loca] No data in \"{spreadsheet.sheets[j]}\" found.");
                     }
                 }
             }
@@ -174,7 +189,7 @@ namespace Loca {
             LocaDatabase database = LocaDatabase.instance;
             database.readOnlyDatabases = subDatabases;
 
-            Debug.Log("Loca from ReadOnly GoogleSheet extracted...");
+            Debug.Log("[Loca] Loca from ReadOnly GoogleSheet extracted...");
         }
 
         private static LocaSubDatabase ExtractSubDatabaseFromSheet(bool readOnly, string spreadsheetId, string sheetNameAndRange) {
@@ -195,7 +210,7 @@ namespace Loca {
                 newSubDatabase.ExtractHeaderData(headerData, !readOnly);
 
                 if (!headerData.Valid(out string error, !readOnly)) {
-                    Debug.Log($"{error} Sheet: {sheetNameAndRange}");
+                    Debug.Log($"[Loca] {error} Sheet: {sheetNameAndRange}");
                     return null;
                 }
 
@@ -267,7 +282,7 @@ namespace Loca {
         /// Extract Keys from each Google Sheet given in our Settings 
         /// </summary>
         public static void ExtractLocaKeysFromSheets() {
-            Debug.Log("Start extracting LocaKeys from GoogleSheet...");
+            Debug.Log("[Loca] Start extracting LocaKeys from GoogleSheet...");
 
             List<LocaSubDatabase> subDatabases = new List<LocaSubDatabase>();
 
@@ -281,7 +296,7 @@ namespace Loca {
                 if (newSubDatabase != null) {
                     subDatabases.Add(newSubDatabase);
                 } else {
-                    Debug.Log($"No data in \"{LocaSettings.instance.googleSettings.sheets[i]}\" found.");
+                    Debug.Log($"[Loca] No data in \"{LocaSettings.instance.googleSettings.sheets[i]}\" found.");
                 }
             }
 
@@ -293,7 +308,7 @@ namespace Loca {
         /// Extract Keys from each Google Sheet given in our Settings 
         /// </summary>
         public static void ExtractLocaKeysFromReadOnlySheets() {
-            Debug.Log("Start extracting LocaKeys from GoogleSheet...");
+            Debug.Log("[Loca] Start extracting LocaKeys from GoogleSheet...");
 
             List<LocaSubDatabase> subDatabases = new List<LocaSubDatabase>();
 
@@ -317,7 +332,7 @@ namespace Loca {
                     if (newSubDatabase != null) {
                         subDatabases.Add(newSubDatabase);
                     } else {
-                        Debug.Log($"No data in \"{spreadsheet.sheets[j]}\" found.");
+                        Debug.Log($"[Loca] No data in \"{spreadsheet.sheets[j]}\" found.");
                     }
                 }
             }
@@ -338,7 +353,7 @@ namespace Loca {
             newSubDatabase.ExtractHeaderData(headerData, !readOnly);
 
             if (!headerData.Valid(out string error, !readOnly)) {
-                Debug.Log($"{error} Sheet: {sheetNameAndRange}");
+                Debug.Log($"[Loca] {error} Sheet: {sheetNameAndRange}");
                 return null;
             }
 

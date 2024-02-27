@@ -22,8 +22,15 @@ namespace Loca {
                 return date;
             }
 
-            UnityEngine.Debug.Log("<color=red>Get LastModified Date via WebRequest failed....fallback to Google Sheet Revision.</color>");
-            return GetSheetModifiedDataViaRevision();
+            date = GetSheetModifiedDataViaRevision();
+
+            if (date != -1) {
+                UnityEngine.Debug.Log("<color=red>[Loca] Get LastModified Date via WebRequest failed...fallback to Google Sheet Revision.</color>");
+                return date;
+            }
+
+            UnityEngine.Debug.Log("<color=red>[Loca] Get LastModified Date failed...maybe you are offline</color>");
+            return -1;
         }
 
         /// <summary>
@@ -107,13 +114,17 @@ namespace Loca {
             request.PageToken = token;
             request.PageSize = 1000;
 
-            RevisionList response = request.Execute();
+            try {
+                RevisionList response = request.Execute();
 
-            if (response.NextPageToken == null) {
-                return response;
+                if (response.NextPageToken == null) {
+                    return response;
+                }
+
+                return GetNewestRevision(response.NextPageToken);
+            } catch {
+                return null;
             }
-
-            return GetNewestRevision(response.NextPageToken);
         }
 
         /// <summary>

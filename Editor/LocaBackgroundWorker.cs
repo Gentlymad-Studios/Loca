@@ -23,7 +23,7 @@ namespace Loca {
             LocaSettings.instance.LoadEditorPrefs();
 
             if (LocaDatabase.instance.databases.Count == 0) {
-                Debug.Log("Loca Keys will be initialized...");
+                Debug.Log("[Loca] Loca Keys will be initialized...");
                 LocaBase.ExtractLocaKeysFromSheets();
             }
 
@@ -77,7 +77,7 @@ namespace Loca {
 
                 if (failToGetModifiedDate) {
                     locaStatus = "Unable to reach LocaSheet modified Date";
-                    Debug.LogWarning("Unable to reach LocaSheet modified Date");
+                    Debug.LogWarning("[Loca] Unable to reach LocaSheet modified Date");
                 }
 
                 LocaBase.currentlyUpdating = false;
@@ -85,20 +85,20 @@ namespace Loca {
             } catch (GoogleApiException ex) {
                 //...wrong spreadsheet id
                 apiFailed = true;
-                Debug.LogWarning(ex);
+                Debug.LogWarning("[Loca] " + ex);
             } catch (InvalidOperationException ex) {
                 //...error in secret
                 apiFailed = true;
-                Debug.LogWarning(ex);
+                Debug.LogWarning("[Loca] " + ex);
             } catch (FormatException ex) {
                 //...error in secret
                 apiFailed = true;
-                Debug.LogWarning(ex);
+                Debug.LogWarning("[Loca] " + ex);
             } catch (HttpRequestException ex) {
                 connectionFailed = true;
-                Debug.LogWarning(ex);
+                Debug.LogWarning("[Loca] " + ex);
             } catch (Exception ex) {
-                Debug.LogWarning(ex);
+                Debug.LogWarning("[Loca] " + ex);
             }
         }
 
@@ -117,12 +117,12 @@ namespace Loca {
                 LocaDatabase.instance.hasOnlineChanges = LocaBase.LocalDatabaseIsUpToDate(out bool failToGetModifiedDate);
 
                 if (failToGetModifiedDate) {
-                    Debug.LogWarning("Unable to reach LocaSheet modified Date");
+                    Debug.LogWarning("[Loca] Unable to reach LocaSheet modified Date");
                     return;
                 }
 
                 if (!LocaDatabase.instance.hasOnlineChanges) {
-                    Debug.Log("Loca Database is out of date and will be updated in background...");
+                    Debug.Log("[Loca] Loca Database is out of date and will be updated in background...");
 
                     LocaBase.currentlyUpdating = true;
                     LocaBase.ExtractDatabasesFromSheets();
@@ -131,20 +131,20 @@ namespace Loca {
             } catch (GoogleApiException ex) {
                 //...wrong spreadsheet id
                 apiFailed = true;
-                Debug.LogWarning(ex);
+                Debug.LogWarning("[Loca] " + ex);
             } catch (InvalidOperationException ex) {
                 //...error in secret
                 apiFailed = true;
-                Debug.LogWarning(ex);
+                Debug.LogWarning("[Loca] " + ex);
             } catch (FormatException ex) {
                 //...error in secret
                 apiFailed = true;
-                Debug.LogWarning(ex);
+                Debug.LogWarning("[Loca] " + ex);
             } catch (HttpRequestException ex) {
                 connectionFailed = true;
-                Debug.LogWarning(ex);
+                Debug.LogWarning("[Loca] " + ex);
             } catch (Exception ex) {
-                Debug.LogError(ex);
+                Debug.LogError("[Loca] " + ex);
             }
         }
 
