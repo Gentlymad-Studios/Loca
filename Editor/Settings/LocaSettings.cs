@@ -70,11 +70,14 @@ namespace Loca {
             [Tooltip("Name of Sheets you want to retrieve")]
             public List<string> sheets = new List<string>() { "All Languages" };
 
-            [Tooltip("Request URL to recieve the LastModified Date of the given Spreadsheet.")]
+            [Tooltip("Request URL to recieve the LastModified Date of the given Spreadsheet. (If this is not given, we fallback to the Google Sheet Revision)")]
             public string spreadsheetLastModifiedRequest = "";
 
             [Tooltip("Request URL to set the LastModified Date of the given Spreadsheet.")]
             public string spreadsheetSetLastModifiedRequest = "";
+
+            [Tooltip("Send Log if we are unable to get the LastModified Date via the Request URL.")]
+            public bool logLastModifiedRequestFail = false;
 
             [Header("ReadOnly Spreadsheets")]
             [Tooltip("API Key to Access the Google Sheets API")]

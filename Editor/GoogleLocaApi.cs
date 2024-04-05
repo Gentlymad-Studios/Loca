@@ -25,7 +25,9 @@ namespace Loca {
             date = GetSheetModifiedDataViaRevision();
 
             if (date != -1) {
-                UnityEngine.Debug.Log("<color=red>[Loca] Get LastModified Date via WebRequest failed...fallback to Google Sheet Revision.</color>");
+                if (LocaSettings.instance.googleSettings.logLastModifiedRequestFail) {
+                    UnityEngine.Debug.Log("<color=red>[Loca] Get LastModified Date via WebRequest failed...fallback to Google Sheet Revision.</color>");
+                }
                 return date;
             }
 
