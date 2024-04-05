@@ -1,11 +1,12 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor;
 using UnityEngine;
 
 namespace Loca {
     public static class LocaJsonHandler {
-
+        [MenuItem(LocaSettings.MENUITEMBASE + nameof(Loca) + "/Export to JSON", priority = 41)]
         public static void WriteLocasheets() {
             bool upToDate = LocaBase.LocalDatabaseIsUpToDate(out bool failToGetModifiedDate);
 
