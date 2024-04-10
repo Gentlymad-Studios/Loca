@@ -79,6 +79,9 @@ namespace Loca {
             [Tooltip("Send Log if we are unable to get the LastModified Date via the Request URL.")]
             public bool logLastModifiedRequestFail = false;
 
+            [Tooltip("If this is enabled, we use the Request URL and the Google Sheet Revision combined to check the Modified date.")]
+            public bool useRequestUrlAndRevisionCheck = false;
+
             [Header("ReadOnly Spreadsheets")]
             [Tooltip("API Key to Access the Google Sheets API")]
             public string apikey = "";

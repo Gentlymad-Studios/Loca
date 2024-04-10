@@ -16,16 +16,17 @@ namespace Loca {
         /// </summary>
         /// <returns>UTC Time in milliseconds. -1 if something fails</returns>
         public static long GetSheetModifiedDate() {
-            long date = GetSheetModifiedDateViaCustomWebRequest();
+            long date = GetSheetModifiedDateViaCustomWebRequest(out bool urlSuccess);
 
-            if (date != -1) {
+            if (urlSuccess && !LocaSettings.instance.googleSettings.useRequestUrlAndRevisionCheck) {
                 return date;
             }
 
-            date = GetSheetModifiedDataViaRevision();
+            long revisionDate = GetSheetModifiedDataViaRevision(out bool revisionSuccess);
+            date = date > revisionDate ? date : revisionDate;
 
-            if (date != -1) {
-                if (LocaSettings.instance.googleSettings.logLastModifiedRequestFail) {
+            if (revisionSuccess) {
+                if (LocaSettings.instance.googleSettings.logLastModifiedRequestFail && !urlSuccess) {
                     UnityEngine.Debug.Log("<color=red>[Loca] Get LastModified Date via WebRequest failed...fallback to Google Sheet Revision.</color>");
                 }
                 return date;
@@ -39,7 +40,7 @@ namespace Loca {
         /// Get the LastModified Date via dedicated WebRequest
         /// </summary>
         /// <returns>UTC Time in milliseconds. -1 if something fails</returns>
-        public static long GetSheetModifiedDateViaCustomWebRequest() {
+        public static long GetSheetModifiedDateViaCustomWebRequest(out bool success) {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(LocaSettings.instance.googleSettings.spreadsheetLastModifiedRequest);
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
             request.Timeout = 4000;
@@ -49,12 +50,14 @@ namespace Loca {
                 using (Stream stream = response.GetResponseStream())
                 using (StreamReader reader = new StreamReader(stream)) {
                     string content = reader.ReadToEnd();
+                    success = true;
                     return long.Parse(content);
                 }
             } catch (WebException e) {
                 if (e.Status == WebExceptionStatus.Timeout) {
                     //UnityEngine.Debug.Log("Timeout");
                 }
+                success = false;
                 return -1;
             }
         }
@@ -63,7 +66,7 @@ namespace Loca {
         /// Get the LastModified Date of the Spreadsheet, max 20.000 calls in 100 seconds
         /// </summary>
         /// <returns>UTC Time in milliseconds</returns>
-        public static long GetSheetModifiedDateViaMeta() {
+        public static long GetSheetModifiedDateViaMeta(out bool success) {
             if (driveHelper == null) {
                 driveHelper = new GoogleDriveHelper();
             }
@@ -74,8 +77,10 @@ namespace Loca {
             Google.Apis.Drive.v3.Data.File response = request.Execute();
 
             if (response != null) {
+                success = true;
                 return (long)Convert.ToDateTime(response.ModifiedTimeRaw).ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
             } else {
+                success = false;
                 return -1;
             }
         }
@@ -84,7 +89,7 @@ namespace Loca {
         /// Get the LastModified Date of the Spreadsheet via Activity, max 100.000 calls in 60 seconds
         /// </summary>
         /// <returns>UTC Time in milliseconds</returns>
-        public static long GetSheetModifiedDataViaRevision() {
+        public static long GetSheetModifiedDataViaRevision(out bool success) {
             if (driveHelper == null) {
                 driveHelper = new GoogleDriveHelper();
             }
@@ -92,16 +97,20 @@ namespace Loca {
             RevisionList response = GetNewestRevision(null);
 
             if (response == null) {
+                success = false;
                 return -1;
             }
 
             if (response.Revisions == null) {
+                success = false;
                 return -1;
             }
 
             if (response.Revisions.Count != 0) {
+                success = true;
                 return (long)Convert.ToDateTime(response.Revisions[response.Revisions.Count - 1].ModifiedTimeRaw).ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
             } else {
+                success = false;
                 return -1;
             }
         }

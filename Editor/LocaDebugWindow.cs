@@ -30,12 +30,16 @@ namespace Loca {
                 Debug.Log("[Loca] " + GoogleLocaApi.GetSheetModifiedDate());
             }
 
+            if (GUILayout.Button("Get Modified Date via Request URL")) {
+                Debug.Log("[Loca] " + GoogleLocaApi.GetSheetModifiedDateViaCustomWebRequest(out _));
+            }
+
             if (GUILayout.Button("Get Modified Date via Revisions")) {
-                Debug.Log("[Loca] " + GoogleLocaApi.GetSheetModifiedDataViaRevision());
+                Debug.Log("[Loca] " + GoogleLocaApi.GetSheetModifiedDataViaRevision(out _));
             }
 
             if (GUILayout.Button("Get Modified Date via Meta")) {
-                Debug.Log("[Loca] " + GoogleLocaApi.GetSheetModifiedDateViaMeta());
+                Debug.Log("[Loca] " + GoogleLocaApi.GetSheetModifiedDateViaMeta(out _));
             }
 
             if (GUILayout.Button("Clear Database")) {
