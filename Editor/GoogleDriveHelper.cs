@@ -8,7 +8,7 @@ namespace Loca {
             get; set;
         }
         const string APPLICATION_NAME = nameof(Loca);
-        static readonly string[] Scopes = { DriveService.Scope.DriveMetadataReadonly };
+        static readonly string[] Scopes = { DriveService.Scope.DriveReadonly };
 
         public GoogleDriveHelper() {
             InitializeService();

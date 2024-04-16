@@ -128,3 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.8] - 2024-04-05
 ### Added
 - add MenuEntry to Export Loc to JSON
+
+## [0.2.9] - 2024-04-16
+### Changed
+- changed Drive Scope from DriveMetadataReadonly to DriveReadonly
