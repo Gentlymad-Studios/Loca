@@ -30,9 +30,12 @@ namespace Loca {
                     UnityEngine.Debug.Log("<color=red>[Loca] Get LastModified Date via WebRequest failed...fallback to Google Sheet Revision.</color>");
                 }
                 return date;
+            } else if(date > -1) {
+                UnityEngine.Debug.Log("<color=red>[Loca] Get LastModified Date via Revision failed...Custom Request URL used.</color>");
+                return date;
             }
 
-            UnityEngine.Debug.Log("<color=red>[Loca] Get LastModified Date failed...maybe you are offline</color>");
+            UnityEngine.Debug.LogError("<color=red>[Loca] Get LastModified Date failed...maybe you are offline</color>");
             return -1;
         }
 
