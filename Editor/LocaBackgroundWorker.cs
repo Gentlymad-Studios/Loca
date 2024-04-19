@@ -2,9 +2,11 @@ using Google;
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Timers;
 using UnityEditor;
 using UnityEngine;
+using Timer = System.Timers.Timer;
 
 namespace Loca {
     public static class LocaBackgroundWorker {
@@ -64,10 +66,7 @@ namespace Loca {
             try {
                 LocaBase.currentlyUpdating = true;
 
-
                 LocaDatabase.instance.hasOnlineChanges = !LocaBase.LocalDatabaseIsUpToDate(out bool failToGetModifiedDate);
-
-
 
                 if (LocaDatabase.instance.hasOnlineChanges) {
                     locaStatus = "<color=red>online changes found</color>";
@@ -85,20 +84,22 @@ namespace Loca {
             } catch (GoogleApiException ex) {
                 //...wrong spreadsheet id
                 apiFailed = true;
-                Debug.LogWarning("[Loca] " + ex);
+                Debug.LogException(ex);
             } catch (InvalidOperationException ex) {
                 //...error in secret
                 apiFailed = true;
-                Debug.LogWarning("[Loca] " + ex);
+                Debug.LogException(ex);
             } catch (FormatException ex) {
                 //...error in secret
                 apiFailed = true;
-                Debug.LogWarning("[Loca] " + ex);
+                Debug.LogException( ex);
             } catch (HttpRequestException ex) {
                 connectionFailed = true;
-                Debug.LogWarning("[Loca] " + ex);
+                Debug.LogException(ex);
+            } catch (ThreadAbortException ex) {
+                //suppress thread abort because its called on recompile
             } catch (Exception ex) {
-                Debug.LogWarning("[Loca] " + ex);
+                Debug.LogException(ex);
             }
         }
 
