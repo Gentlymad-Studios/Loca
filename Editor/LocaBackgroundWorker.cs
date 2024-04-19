@@ -33,6 +33,7 @@ namespace Loca {
                 return;
             }
 
+
             //Start the timer to check for modified frequently
             checkModifiedTimer = new Timer {
                 Interval = LocaSettings.instance.googleSettings.checkForModifiedInterval
@@ -66,6 +67,7 @@ namespace Loca {
             try {
                 LocaBase.currentlyUpdating = true;
 
+
                 LocaDatabase.instance.hasOnlineChanges = !LocaBase.LocalDatabaseIsUpToDate(out bool failToGetModifiedDate);
 
                 if (LocaDatabase.instance.hasOnlineChanges) {
@@ -96,7 +98,7 @@ namespace Loca {
             } catch (HttpRequestException ex) {
                 connectionFailed = true;
                 Debug.LogException(ex);
-            } catch (ThreadAbortException ex) {
+            } catch (ThreadAbortException) {
                 //suppress thread abort because its called on recompile
             } catch (Exception ex) {
                 Debug.LogException(ex);

@@ -35,7 +35,6 @@ namespace Loca {
             long onlineDate = GoogleLocaApi.GetSheetModifiedDate();
 
             if (onlineDate == -1) {
-                //optional we could provide a fallback to antoher GetSheetModifiedDate method, best case would be the revision method, but we need to implement pagenation correctly (slow)
                 fail = true;
             } else {
                 fail = false;
