@@ -35,7 +35,7 @@ namespace Loca {
                 return date;
             }
 
-            UnityEngine.Debug.LogError("<color=red>[Loca] Get LastModified Date failed...maybe you are offline</color>");
+            UnityEngine.Debug.Log("<color=red>[Loca] Get LastModified Date failed...maybe you are offline</color>");
             return -1;
         }
 

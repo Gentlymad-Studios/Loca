@@ -100,8 +100,11 @@ namespace Loca {
                 Debug.LogException(ex);
             } catch (ThreadAbortException) {
                 //suppress thread abort because its called on recompile
+            } catch (UnityException) {
+                //suppress UnityException because its called on recompile
             } catch (Exception ex) {
                 Debug.LogException(ex);
+
             }
         }
 
@@ -187,4 +190,5 @@ namespace Loca {
             }
         }
     }
+
 }
