@@ -132,3 +132,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.9] - 2024-04-16
 ### Changed
 - changed Drive Scope from DriveMetadataReadonly to DriveReadonly
+
+
+## [0.3.0] - 2024-06-03
+### Added
+- add option to ignore defined languages for export

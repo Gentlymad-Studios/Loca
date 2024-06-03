@@ -11,6 +11,7 @@ namespace Loca {
         [MenuItem(LocaSettings.MENUITEMBASE + nameof(Loca) + "/Export to JSON", priority = 41)]
         public static void WriteLocasheets() {
             bool upToDate = LocaBase.LocalDatabaseIsUpToDate(out bool failToGetModifiedDate);
+            LocaSettings.JsonDataSettings jsonSettings = LocaSettings.instance.jsonSettings;
 
             if (failToGetModifiedDate) {
                 Debug.LogError("[Loca] Unable to reach LocaSheet modified Date");
@@ -25,12 +26,12 @@ namespace Loca {
                 return;
             }
 
-            string destination = Path.Combine(Application.dataPath, LocaSettings.instance.jsonSettings.exportDestination);
+            string destination = Path.Combine(Application.dataPath, jsonSettings.exportDestination);
             if (!Directory.Exists(destination)) {
                 Directory.CreateDirectory(destination);
             }
 
-            string editorDestination = Path.Combine(Application.dataPath, LocaSettings.instance.jsonSettings.editorExportDestination);
+            string editorDestination = Path.Combine(Application.dataPath, jsonSettings.editorExportDestination);
             if (!Directory.Exists(editorDestination)) {
                 Directory.CreateDirectory(editorDestination);
             }
@@ -46,14 +47,19 @@ namespace Loca {
 
                 //Runtime Json's
                 for (int lang = 0; lang < databases[i].languages.Count; lang++) {
+                    string runtimeJsonFilename = $"{databases[i].sheetName}_{databases[i].languages[lang]}.json";
+                    string runtimeJsonPath = Path.Combine(destination, runtimeJsonFilename);
+
                     if (IgnoreLanguage(databases[i].languages[lang])) {
+                        if (jsonSettings.removeIgnoredLanguages && File.Exists(runtimeJsonPath)) {
+                            File.Delete(runtimeJsonPath);
+                        }
                         continue;
                     }
 
                     LocaModel runtimeJsonObject = databases[i].ToRuntimeJson(lang);
                     string runtimeJson = JsonConvert.SerializeObject(runtimeJsonObject, Formatting.Indented);
-                    string runtimeJsonFilename = $"{databases[i].sheetName}_{databases[i].languages[lang]}.json";
-                    File.WriteAllText(Path.Combine(destination, runtimeJsonFilename), runtimeJson);
+                    File.WriteAllText(runtimeJsonPath, runtimeJson);
                 }
             }
         }

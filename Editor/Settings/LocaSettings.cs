@@ -57,6 +57,8 @@ namespace Loca {
             public string editorExportDestination = "PackageEditor/Languages";
             [Tooltip("List of languages that should not be exported. Use language codes!")]
             public string[] ignoredLanguages;
+            [Tooltip("If this is enabled, JSON of ignored Languages will be removed.")]
+            public bool removeIgnoredLanguages = true;
         }
 
         [Serializable]
