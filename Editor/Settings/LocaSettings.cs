@@ -55,6 +55,8 @@ namespace Loca {
         public class JsonDataSettings {
             public string exportDestination = "Package/Languages";
             public string editorExportDestination = "PackageEditor/Languages";
+            [Tooltip("List of languages that should not be exported. Use language codes!")]
+            public string[] ignoredLanguages;
         }
 
         [Serializable]

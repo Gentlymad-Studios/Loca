@@ -1,5 +1,7 @@
+using Google.Apis.Sheets.v4.Data;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -44,12 +46,36 @@ namespace Loca {
 
                 //Runtime Json's
                 for (int lang = 0; lang < databases[i].languages.Count; lang++) {
+                    if (IgnoreLanguage(databases[i].languages[lang])) {
+                        continue;
+                    }
+
                     LocaModel runtimeJsonObject = databases[i].ToRuntimeJson(lang);
                     string runtimeJson = JsonConvert.SerializeObject(runtimeJsonObject, Formatting.Indented);
                     string runtimeJsonFilename = $"{databases[i].sheetName}_{databases[i].languages[lang]}.json";
                     File.WriteAllText(Path.Combine(destination, runtimeJsonFilename), runtimeJson);
                 }
             }
+        }
+
+        private static bool IgnoreLanguage(string language) {
+            CultureInfo currentCultureInfo = new CultureInfo(language);
+            CultureInfo ignoredCultureInfo;
+
+            string[] ignoredLanguages = LocaSettings.instance.jsonSettings.ignoredLanguages;
+
+            for (int i = 0; i < ignoredLanguages.Length; i++) {
+                try {
+                    ignoredCultureInfo = new CultureInfo(ignoredLanguages[i]);
+                } catch {
+                    continue;
+                }
+                if (ignoredCultureInfo.Name == currentCultureInfo.Name) {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
