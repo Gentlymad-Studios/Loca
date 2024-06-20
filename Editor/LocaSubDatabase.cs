@@ -333,7 +333,7 @@ namespace Loca {
                     continue;
                 }
 
-                if (LocaSettings.instance.Adapter.ValidateEntry(locaEntries[i], false)) {
+                if (LocaSettings.instance.Adapter.ValidateEntry(locaEntries[i], true)) {
                     if (jsonObject.translations.ContainsKey(locaEntries[i].Hash)) {
                         Debug.Log("[Loca] " + jsonObject.translations[locaEntries[i].Hash]);
                         Debug.Log("[Loca] " + locaEntries[i].Hash + " - " + locaEntries[i].key);
@@ -361,7 +361,7 @@ namespace Loca {
                     continue;
                 }
 
-                if (LocaSettings.instance.Adapter.ValidateEntry(locaEntries[i], true)) {
+                if (LocaSettings.instance.Adapter.ValidateEntry(locaEntries[i], false)) {
                     jsonObject.translations.Add(locaEntries[i].Hash, locaEntries[i].content[langIndex].content);
                 }
             }
