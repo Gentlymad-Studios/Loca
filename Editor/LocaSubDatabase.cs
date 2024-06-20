@@ -333,12 +333,14 @@ namespace Loca {
                     continue;
                 }
 
-                if (jsonObject.translations.ContainsKey(locaEntries[i].Hash)) {
-                    Debug.Log("[Loca] " + jsonObject.translations[locaEntries[i].Hash]);
-                    Debug.Log("[Loca] " + locaEntries[i].Hash + " - " + locaEntries[i].key);
-                }
+                if (LocaSettings.instance.Adapter.ValidateEntry(locaEntries[i], false)) {
+                    if (jsonObject.translations.ContainsKey(locaEntries[i].Hash)) {
+                        Debug.Log("[Loca] " + jsonObject.translations[locaEntries[i].Hash]);
+                        Debug.Log("[Loca] " + locaEntries[i].Hash + " - " + locaEntries[i].key);
+                    }
 
-                jsonObject.translations.Add(locaEntries[i].Hash, locaEntries[i].key);
+                    jsonObject.translations.Add(locaEntries[i].Hash, locaEntries[i].key);
+                }
             }
 
             return jsonObject;
@@ -359,7 +361,9 @@ namespace Loca {
                     continue;
                 }
 
-                jsonObject.translations.Add(locaEntries[i].Hash, locaEntries[i].content[langIndex].content);
+                if (LocaSettings.instance.Adapter.ValidateEntry(locaEntries[i], true)) {
+                    jsonObject.translations.Add(locaEntries[i].Hash, locaEntries[i].content[langIndex].content);
+                }
             }
 
             return jsonObject;

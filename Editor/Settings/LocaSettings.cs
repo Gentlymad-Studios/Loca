@@ -12,6 +12,25 @@ namespace Loca {
         public override string Path => "Tools/" + nameof(Loca);
         public const string MENUITEMBASE = "Tools/";
 
+        [Header("Adapter")]
+        [SerializeReference]
+        public CustomAdapter customAdapter = null;
+
+        [NonSerialized]
+        private IAdapter adapter;
+        public IAdapter Adapter {
+            get {
+                if (adapter == null) {
+                    if (customAdapter == null) {
+                        adapter = new DefaultAdapter();
+                    } else {
+                        adapter = customAdapter;
+                    }
+                }
+                return adapter;
+            }
+        }
+
         [Space]
         public HeaderDataSettings headerSettings = new HeaderDataSettings();
 

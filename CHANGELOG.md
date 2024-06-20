@@ -137,3 +137,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.0] - 2024-06-03
 ### Added
 - add option to ignore defined languages for export
+
+## [0.3.1] - 2024-06-03
+### Added
+- add loca entry validation on export
+- add adapter
