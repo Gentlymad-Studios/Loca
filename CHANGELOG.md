@@ -142,3 +142,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - add loca entry validation on export
 - add adapter
+
+## [0.3.2] - 2024-10-08
+### Changed
+- text edits are now finished after focus lost to prevent HasChanges flag only got changes if there is one

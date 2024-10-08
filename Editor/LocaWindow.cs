@@ -33,6 +33,9 @@ namespace Loca {
         private string selectedDatabaseName;
         private int selectedDatabaseIndex = 0;
 
+        private LocaEntry editEntry;
+        private LocaEntry.LocaArray editEntryArray;
+
         [MenuItem(LocaSettings.MENUITEMBASE + nameof(Loca) + "/" + WINDOWNAME, priority = 40)]
         public static void Initialize() {
             window = GetWindow<LocaWindow>(WINDOWNAME);
@@ -327,11 +330,45 @@ namespace Loca {
 
                 TextField textField = activeElement.Q<TextField>();
                 textField.style.display = DisplayStyle.None;
-                textField.value = "";
+                //textField.value = "";
                 textField.UnregisterValueChangedCallback(TextChanged);
                 textField.UnregisterCallback<FocusOutEvent>(FocusLost);
 
                 activeElement = null;
+
+                if (label.text != textField.value) {
+                    //if this is null, we edited an Key
+                    if (editEntryArray == null) {
+                        if (!curDatabase.KeyExists(textField.value)) {
+                            label.style.color = LocaSettings.instance.hightlightColor;
+                            label.style.unityFontStyleAndWeight = FontStyle.Italic;
+
+                            editEntry.key = textField.value;
+                            label.text = editEntry.key;
+
+                            editEntry.hasKeyChanges = true;
+                            editEntry.EntryUpdated();
+                            curDatabase.ClearEntriesMappingAndStorage();
+                        }
+                    } else {
+                        editEntryArray.content = textField.value;
+
+                        if (label.enableRichText) {
+                            label.text = HighlightTextMarkups(editEntryArray.content);
+                        } else {
+                            label.text = editEntryArray.content;
+                        }
+
+                        label.style.color = LocaSettings.instance.hightlightColor;
+                        label.style.unityFontStyleAndWeight = FontStyle.Italic;
+
+                        editEntryArray.hasChanges = true;
+                        editEntry.EntryUpdated();
+                    }
+                }
+
+                editEntry = null;
+                editEntryArray = null;
             }
         }
         #endregion
@@ -381,35 +418,49 @@ namespace Loca {
             if (label.text != evt.newValue) {
                 if (cellUserData.languageIndex == -1) {
                     //Key
+                    //store currently edited data
+                    if (editEntry == null) {
+                        editEntry = tableEntries[cellUserData.rowIndex];
+                    }
+
+                    //(this is moved to the DisableActiveElement logic)
                     if (curDatabase.KeyExists(evt.newValue)) {
                         textField.Q<VisualElement>("unity-text-input").style.color = LocaSettings.instance.hightlightColor;
                     } else {
                         textField.Q<VisualElement>("unity-text-input").style.color = StyleKeyword.Null;
-                        tableEntries[cellUserData.rowIndex].key = evt.newValue;
-                        label.text = tableEntries[cellUserData.rowIndex].key;
+                        //tableEntries[cellUserData.rowIndex].key = evt.newValue;
+                        //label.text = tableEntries[cellUserData.rowIndex].key;
                     }
 
-                    label.style.color = LocaSettings.instance.hightlightColor;
-                    label.style.unityFontStyleAndWeight = FontStyle.Italic;
+                    //label.style.color = LocaSettings.instance.hightlightColor;
+                    //label.style.unityFontStyleAndWeight = FontStyle.Italic;
 
-                    tableEntries[cellUserData.rowIndex].hasKeyChanges = true;
-                    tableEntries[cellUserData.rowIndex].EntryUpdated();
-                    curDatabase.ClearEntriesMappingAndStorage();
+                    //tableEntries[cellUserData.rowIndex].hasKeyChanges = true;
+                    //tableEntries[cellUserData.rowIndex].EntryUpdated();
+                    //curDatabase.ClearEntriesMappingAndStorage();
                 } else {
                     //Content
-                    tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content = evt.newValue;
-
-                    if (label.enableRichText) {
-                        label.text = HighlightTextMarkups(tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content);
-                    } else {
-                        label.text = tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content;
+                    //store currently edited data
+                    if (editEntry == null || editEntryArray == null) {
+                        editEntry = tableEntries[cellUserData.rowIndex];
+                        editEntryArray = tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex];
                     }
 
-                    label.style.color = LocaSettings.instance.hightlightColor;
-                    label.style.unityFontStyleAndWeight = FontStyle.Italic;
+                    //(this is moved to the DisableActiveElement logic)
 
-                    tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].hasChanges = true;
-                    tableEntries[cellUserData.rowIndex].EntryUpdated();
+                    //tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content = evt.newValue;
+
+                    //if (label.enableRichText) {
+                    //    label.text = HighlightTextMarkups(tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content);
+                    //} else {
+                    //    label.text = tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content;
+                    //}
+
+                    //label.style.color = LocaSettings.instance.hightlightColor;
+                    //label.style.unityFontStyleAndWeight = FontStyle.Italic;
+
+                    //tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].hasChanges = true;
+                    //tableEntries[cellUserData.rowIndex].EntryUpdated();
                 }
             }
         }
