@@ -267,7 +267,7 @@ namespace Loca {
                 if (tableEntries[index].hasKeyChanges) {
                     label.style.color = LocaSettings.instance.hightlightColor;
                     label.style.unityFontStyleAndWeight = FontStyle.Italic;
-                } else {
+                } else if (!LocaSettings.instance.Adapter.OverwriteCellLabelStyle(label, tableEntries[index])) {
                     label.style.color = StyleKeyword.Null;
                     label.style.unityFontStyleAndWeight = StyleKeyword.Null;
                 }
@@ -305,7 +305,7 @@ namespace Loca {
                     if (tableEntries[index].content[langIndex].hasChanges) {
                         label.style.color = LocaSettings.instance.hightlightColor;
                         label.style.unityFontStyleAndWeight = FontStyle.Italic;
-                    } else {
+                    } else if (!LocaSettings.instance.Adapter.OverwriteCellLabelStyle(label, tableEntries[index], tableEntries[index].content[langIndex])) {
                         label.style.color = StyleKeyword.Null;
                         label.style.unityFontStyleAndWeight = StyleKeyword.Null;
                     }

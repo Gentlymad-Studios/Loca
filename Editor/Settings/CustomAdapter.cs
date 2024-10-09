@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Loca {
     [Serializable]
@@ -9,5 +10,7 @@ namespace Loca {
         public abstract bool SaveEntry(LocaEntry entry, LocaEntry.LocaArray entryLocaArray = null);
 
         public abstract bool TryEnterEditMode(LocaEntry entry, LocaEntry.LocaArray entryLocaArray = null);
+
+        public abstract bool OverwriteCellLabelStyle(Label label, LocaEntry entry, LocaEntry.LocaArray entryLocaArray = null);
     }
 }

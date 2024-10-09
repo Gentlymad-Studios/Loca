@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Loca {
     public class DefaultAdapter : IAdapter {
@@ -13,6 +12,10 @@ namespace Loca {
 
         public bool TryEnterEditMode(LocaEntry entry, LocaEntry.LocaArray entryLocaArray = null) {
             return true;
+        }
+
+        public bool OverwriteCellLabelStyle(Label label, LocaEntry entry, LocaEntry.LocaArray entryLocaArray = null) {
+            return false;
         }
     }
 }
