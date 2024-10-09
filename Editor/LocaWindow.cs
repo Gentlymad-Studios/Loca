@@ -366,10 +366,10 @@ namespace Loca {
                         editEntry.EntryUpdated();
                     }
                 }
-
-                editEntry = null;
-                editEntryArray = null;
             }
+
+            editEntry = null;
+            editEntryArray = null;
         }
         #endregion
 
