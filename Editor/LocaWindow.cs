@@ -339,7 +339,7 @@ namespace Loca {
                 if (label.text != textField.value) {
                     //if this is null, we edited an Key
                     if (editEntryArray == null) {
-                        if (!curDatabase.KeyExists(textField.value)) {
+                        if (!curDatabase.KeyExists(textField.value) && LocaSettings.instance.Adapter.SaveEntry(editEntry)) {
                             label.style.color = LocaSettings.instance.hightlightColor;
                             label.style.unityFontStyleAndWeight = FontStyle.Italic;
 
@@ -350,7 +350,7 @@ namespace Loca {
                             editEntry.EntryUpdated();
                             curDatabase.ClearEntriesMappingAndStorage();
                         }
-                    } else {
+                    } else if (LocaSettings.instance.Adapter.SaveEntry(editEntry, editEntryArray)) {
                         editEntryArray.content = textField.value;
 
                         if (label.enableRichText) {
