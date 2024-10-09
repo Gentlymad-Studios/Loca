@@ -388,15 +388,22 @@ namespace Loca {
 
                 CellUserData cellUserData = (CellUserData)label.userData;
 
+                LocaEntry entry = tableEntries[cellUserData.rowIndex];
+                LocaEntry.LocaArray entryLocaArray = cellUserData.languageIndex == -1 ? null : entry.content[cellUserData.languageIndex];
+
+                if (!LocaSettings.instance.Adapter.TryEnterEditMode(entry, entryLocaArray)) {
+                    return;
+                }
+
                 DisableActiveElement();
                 activeElement = label.parent;
 
                 label.style.display = DisplayStyle.None;
                 textField.style.display = DisplayStyle.Flex;
                 if (cellUserData.languageIndex == -1) {
-                    textField.value = tableEntries[cellUserData.rowIndex].key;
+                    textField.value = entry.key;
                 } else {
-                    textField.value = tableEntries[cellUserData.rowIndex].content[cellUserData.languageIndex].content;
+                    textField.value = entryLocaArray.content;
                 }
                 textField.Focus();
 

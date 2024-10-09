@@ -7,5 +7,7 @@ namespace Loca {
         public abstract bool ValidateEntry(LocaEntry entry, bool log);
 
         public abstract bool SaveEntry(LocaEntry entry, LocaEntry.LocaArray entryLocaArray = null);
+
+        public abstract bool TryEnterEditMode(LocaEntry entry, LocaEntry.LocaArray entryLocaArray = null);
     }
 }

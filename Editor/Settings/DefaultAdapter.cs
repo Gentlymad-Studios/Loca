@@ -10,5 +10,9 @@ namespace Loca {
         public bool SaveEntry(LocaEntry entry, LocaEntry.LocaArray entryLocaArray = null) {
             return true;
         }
+
+        public bool TryEnterEditMode(LocaEntry entry, LocaEntry.LocaArray entryLocaArray = null) {
+            return true;
+        }
     }
 }
