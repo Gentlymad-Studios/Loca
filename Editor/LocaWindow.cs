@@ -72,6 +72,8 @@ namespace Loca {
 
             LocaBase.LocalDatabaseIsUpToDate(out bool failToGetModifiedDate);
 
+            searchWindow?.Close();
+
             if (LocaDatabase.instance.hasLocalChanges && !failToGetModifiedDate) {
                 int changesLimit = 50;
 

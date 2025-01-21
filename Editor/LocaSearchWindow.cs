@@ -9,6 +9,8 @@ namespace Loca {
         LocaSearch locaSearch;
         LocaWindow locaWindow;
         Label outputLabel;
+        Button nextButton;
+        Button prevButton;
 
         public void Initialize(LocaSubDatabase database, LocaWindow locaWindow) {
             minSize = new UnityEngine.Vector2(300, 75);
@@ -29,17 +31,19 @@ namespace Loca {
             //searchTextField.isDelayed = true; //to listen on focus lost / press enter
             searchTextField.RegisterValueChangedCallback(Search);
 
-            Button nextButton = rootVisualElement.Q("nextButton") as Button;
+            nextButton = rootVisualElement.Q("nextButton") as Button;
             nextButton.clicked -= NextButton_clicked;
             nextButton.clicked += NextButton_clicked;
             nextButton.Add(new Image() { image = EditorGUIUtility.IconContent("d_tab_next@2x").image });
 
-            Button prevButton = rootVisualElement.Q("prevButton") as Button;
+            prevButton = rootVisualElement.Q("prevButton") as Button;
             prevButton.clicked -= PrevButton_clicked;
             prevButton.clicked += PrevButton_clicked;
             prevButton.Add(new Image() { image = EditorGUIUtility.IconContent("d_tab_prev@2x").image });
 
             outputLabel = rootVisualElement.Q("outputLabel") as Label;
+
+            ToggleNextPrevButtons();
         }
 
         private void NextButton_clicked() {
@@ -70,6 +74,8 @@ namespace Loca {
             outputLabel.text = $"{entryCount} Entries found";
 
             Select(locaSearch.Current());
+
+            ToggleNextPrevButtons();
         }
 
         private void Select(LocaSearchEntry entry) {
@@ -79,6 +85,12 @@ namespace Loca {
 
             locaWindow.table.SetSelection(entry.index);
             locaWindow.table.ScrollToItem(entry.index);
+        }
+
+        private void ToggleNextPrevButtons() {
+            bool state = locaSearch.GetSearchEntryCount() > 1;
+            nextButton.SetEnabled(state);
+            prevButton.SetEnabled(state);
         }
     }
 }

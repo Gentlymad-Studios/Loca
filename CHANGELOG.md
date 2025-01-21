@@ -133,7 +133,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - changed Drive Scope from DriveMetadataReadonly to DriveReadonly
 
-
 ## [0.3.0] - 2024-06-03
 ### Added
 - add option to ignore defined languages for export
@@ -153,4 +152,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.4] - 2024-10-09
 ### Added
-- added option to overwrite label style 
+- added option to overwrite label style
+
+## [0.3.5] - 2025-01-21
+### Fixed
+- search popup now closes when the main window is closed
+- next and previous buttons are now disabled when nothing is found
